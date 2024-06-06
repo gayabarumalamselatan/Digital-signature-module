@@ -1,15 +1,15 @@
-import React, { useRef, useState } from "react";
-import { Toast } from "primereact/toast";
-import { Tooltip } from "primereact/tooltip";
-import { FileUpload } from "primereact/fileupload";
-import { ProgressBar } from "primereact/progressbar";
-import { Button } from "primereact/button";
-import { Image } from "primereact/image";
-import { Tag } from "primereact/tag";
-import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
+import "primeicons/primeicons.css";
+import { Button } from "primereact/button";
+import { FileUpload } from "primereact/fileupload";
+import { Image } from "primereact/image";
+import { ProgressBar } from "primereact/progressbar";
 import "primereact/resources/primereact.css";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
+import { Tag } from "primereact/tag";
+import { Toast } from "primereact/toast";
+import { Tooltip } from "primereact/tooltip";
+import React, { useRef, useState } from "react";
 import "./flags.css";
 import "./index.css";
 
@@ -102,7 +102,7 @@ const TemplateDemo = () => {
     let iconSource = ""; // Initialize icon source
 
     if (fileType === "application/pdf") {
-      iconSource = "assets/pdf.png"; // Path to your PDF icon
+      iconSource = "assets/pdf.png" // Path to your PDF icon
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
       iconSource = "assets/docx.png"; // Path to your DOCX icon
     } else {

@@ -40,7 +40,6 @@ module.exports = {
             name: 'gritsignaturemodule',
             filename: 'signatureModule.js',
             exposes: {
-                './AllServerDashboard': './src/Components/AllServerDashboard',
                 './Create': './src/Components/Create',
                 './Report': './src/Components/Report',
                 './View': './src/Components/View'

@@ -44,14 +44,13 @@
 
 // export default PdfViewer;
 
-import React, { useState, useEffect } from "react";
-import { Worker, Viewer } from "@react-pdf-viewer/core";
+import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import axios from "axios";
-import { Spinner, Button, Alert, Pagination } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useEffect, useState } from "react";
+import { Alert, Spinner } from "react-bootstrap";
 
 function PdfViewer() {
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -106,7 +105,6 @@ function PdfViewer() {
     <div className="container mt-4">
       <div className="card p-5">
         <div className="p-3">
-          <h2>PDF Viewer</h2>
         </div>
         <div className="mb-3">
           <label className="form-label" htmlFor="upload-pdf">

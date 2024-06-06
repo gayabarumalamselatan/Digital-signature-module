@@ -1,8 +1,7 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "primereact/button";
-import React, { useState } from "react";
-import ModalsVV from "./Modals/ModalsVV";
+import React, { useEffect, useState } from "react";
 
 const Report = () => {
   const [formData, setFormData] = useState({
@@ -10,35 +9,33 @@ const Report = () => {
     Status: "",
   });
 
-  const[data, setData] = useState([]);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
-    try{
+    try {
       const response = await axios.get("/api/data");
-      setFormData(response.data);
-    }catch(error){
+      setData(response.data);
+    } catch (error) {
       console.error("Error fetching data: ", error);
     }
-  }
-
-  const [showDetails, setShowDetails] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(formData);
-
     try {
-      const response = await axios.post("/api/submitReport", formData); // Ganti "/api/submitReport" dengan endpoint yang sesuai di server
+      const response = await axios.post("/api/submitReport", formData);
       console.log("Server response:", response.data);
-
-      // Tampilkan notifikasi atau informasi sukses jika diperlukan
       alert("Form submitted successfully!");
-
       setFormData({
         DueDate: "",
         Status: "",
       });
+      // Refresh data after successful submission
+      fetchData();
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("There was an error submitting the form.");
@@ -54,6 +51,8 @@ const Report = () => {
   };
 
   const handleViewClick = (rowData) => {
+    // You can implement this based on your requirement
+    // For now, I'll keep the setSelectedRowData and setShowDetails to be used in the ModalView component
     setSelectedRowData(rowData);
     setShowDetails(true);
   };
@@ -72,21 +71,38 @@ const Report = () => {
               <label htmlFor="DueDate" className="form-label">
                 Due Date
               </label>
-              <input type="date" className="form-control" id="DueDate" name="DueDate" value={formData.DueDate} onChange={handleChange} />
+              <input
+                type="date"
+                className="form-control"
+                id="DueDate"
+                name="DueDate"
+                value={formData.DueDate}
+                onChange={handleChange}
+              />
             </div>
             <div className="mb-3 col-md-5" style={{ marginRight: "90px" }}>
               <label htmlFor="Status" className="form-label">
                 Status
               </label>
-              <select className="form-select col-4" id="Status" name="Status" value={formData.Status} onChange={handleChange}>
+              <select
+                className="form-select "
+                id="Status"
+                name="Status"
+                value={formData.Status}
+                onChange={handleChange}
+              >
                 <option value="">Select an option</option>
                 <option value="Approve">Approve</option>
                 <option value="Reject">Reject</option>
                 <option value="Pending">Pending</option>
                 {/* ... (opsi lainnya) */}
               </select>
-              <div className="mb-3 col-12 p-5" style={{ marginLeft: "145px" }}>
-                <Button label="Submit" className="btn btn-primary w-50" onClick={handleSubmit} />
+              <div className="mb-3 py-5 text-end" >
+                <Button
+                  label="Submit"
+                  className="btn btn-primary text-end"
+                  onClick={handleSubmit}
+                />
               </div>
             </div>
           </div>
@@ -109,29 +125,24 @@ const Report = () => {
                     <th scope="col">User Approval 1</th>
                     <th scope="col">User Approval 2</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {
-                    data.map((item, index) => (
-                      <tr key={index}>
-                        <td scope="row">{index + 1}</td>
-                        <td>{item.title}</td>
-                        <td>{item.requestor}</td>
-                        <td>{item.requestDate}</td>
-                        <td>{item.requestTitle}</td>
-                        <td>{item.requestDetail}</td>
-                        <td>{item.dueDate}</td>
-                        <td>{item.userMaker}</td>
-                        <td>{item.userApproval1}</td>
-                        <td>{item.userApproval2}</td>
-                        <td>{item.status}</td>
-                        <td>
-                          <ModalsVV />
-                        </td>
-                      </tr>
-                    ))}
+                  {data.map((item, index) => (
+                    <tr key={index}>
+                      <td scope="row">{index + 1}</td>
+                      <td>{item.title}</td>
+                      <td>{item.requestor}</td>
+                      <td>{item.requestDate}</td>
+                      <td>{item.requestTitle}</td>
+                      <td>{item.requestDetail}</td>
+                      <td>{item.dueDate}</td>
+                      <td>{item.userMaker}</td>
+                      <td>{item.userApproval1}</td>
+                      <td>{item.userApproval2}</td>
+                      <td>{item.status}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

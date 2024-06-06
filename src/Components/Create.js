@@ -1,9 +1,10 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DropFileInput from "./drop-file-input/DropFileInput";
+
 
 const MySwal = withReactContent(Swal);
 
@@ -237,7 +238,7 @@ function Create() {
             </div>
           </div>
 
-          <div className="mb-3 col-12 p-5">
+          <div className="mb-3 text-center p-5">
             <button className="btn btn-primary" variant="primary" onClick={handleSubmit}>
               Submit
             </button>
