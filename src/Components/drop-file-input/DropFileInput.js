@@ -102,7 +102,8 @@ const TemplateDemo = () => {
     let iconSource = ""; // Initialize icon source
 
     if (fileType === "application/pdf") {
-      iconSource = "assets/pdf.png" // Path to your PDF icon
+      iconSource = "assets/pdf.png"
+ // Path to your PDF icon
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
       iconSource = "assets/docx.png"; // Path to your DOCX icon
     } else {
