@@ -26,7 +26,7 @@ const TemplateDemo = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const maxFileSize = 25 * 1024 * 1024; // 25MB in bytes
-  const allowedFileTypes = ["image/*", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+  const allowedFileTypes = [ "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
 
   const onTemplateSelect = (e) => {
     let _totalSize = totalSize; // Initialize with existing total size
@@ -38,7 +38,7 @@ const TemplateDemo = () => {
           toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: "Invalid file type. Only images, PDFs, and DOCX files are allowed.",
+            detail: "Invalid file type. Only PDFs, and DOCX files are allowed.",
           });
           e.files.splice(key, 1); // Remove invalid file
           return; // Stop processing if invalid file is found
@@ -146,24 +146,22 @@ const TemplateDemo = () => {
   };
   const itemTemplate = (file, props) => {
     const fileType = file.type; // Get the file type
-    let iconSource = ""; // Initialize icon source
+     let icon;// Initialize icon source
 
     if (fileType === "application/pdf") {
-      iconSource = "/Icon/pdf.png"; // Path to your PDF icon
+      icon = 'pi pi-file-pdf'; // Path to your PDF icon
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-      iconSource = "/Icon/docx.png"; // Path to your DOCX icon
-    } else {
-      iconSource = file.objectURL; // Default to image preview
+      icon = "pi pi-file-word"; // Path to your DOCX icon
     }
 
     return (
       <div className="flex align-items-center flex-wrap" style={{ padding: "10px 5px", borderBottom: "2px solid #ccc",}}>
         <div className="d-flex align-items-center" style={{ width: "100%", borderBottomLeftRadius: '0px'  }}>
-          <img className="fileIcon" src="./icon/docx.png" alt=""  />
+          <i className={icon} style={{fontSize: "2em"}}/>
           <br/> 
           <div className="flex flex-column text-left ml-3">
+            <span> {file.name} </span>
             <small>{new Date().toLocaleDateString()}</small>
-            <span>{file.name}</span>
           </div>
         </div>
         <Tag value={props.formatSize} severity="warning" className="px-3 me-2  py-2" />

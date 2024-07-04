@@ -393,7 +393,9 @@ const ViewMemo = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const MySwal = withReactContent(Swal);
   const token = getToken();
+
   const userName = sessionStorage.getItem('userId');
+  
 
   // Buat ngambil token buat postman
   // Apus klo app udah jadi
@@ -442,7 +444,7 @@ const ViewMemo = () => {
         urlParams = `size=${pageSize}&page=${currentPage}`;
       }
   
-      const requestUrl = `${MEMO_SERVICE_VIEW_PAGINATE}?${urlParams}`;
+      const requestUrl = `${MEMO_SERVICE_VIEW_PAGINATE}?${urlParams}&?${userName}`;
       console.log("Request URL:", requestUrl);
   
       const response = await axios.get(requestUrl, { headers });

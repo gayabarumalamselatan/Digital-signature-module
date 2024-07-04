@@ -188,14 +188,14 @@ function CreateMemo() {
             <form className="form-group" onSubmit={handleSubmit}>
               {renderInputField("Title", "title")}
               {renderInputField("Nomor", "nomor")}
-              {renderSelectField("Requestor", "requestor", ["test1"])}
+              {renderSelectField("Requestor", "requestor", ["test 1", "test 2"])}
               {renderInputField("Request Date", "requestDate", "date")}
               {renderInputField("Request Title", "requestTitle")}
               {renderTextAreaField("Request Detail", "requestDetail")}
               {renderSelectField("Tipe Dokumen", "tipeDokumen", ["BAST", "Klaim Kesehatan", "RO PO", "Lain-lain"])}
               {renderInputField("Create Date", "createDate", "date")}
               {renderInputField("Due Date", "dueDate", "date")}
-              {renderSelectField("Status Memo", "statusMemo", ["test3"])}
+              {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])}
               {renderTextAreaField("User Approval 1 Note", "userApproval1Note")}
               {renderTextAreaField("User Approval 2 Note", "userApproval2Note")}
               {renderSelectField("User Approval 1 Name", "userApproval1Name", ["Nama Approval 1 1", "Nama Approval 1 2"])}

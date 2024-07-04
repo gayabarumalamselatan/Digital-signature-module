@@ -98,11 +98,12 @@ const MemoReport = () => {
               </label>
               <select className="form-select" id="statusMemo" name="statusMemo" value={formData.statusMemo} onChange={handleChange}>
                 <option value="">Select an option</option>
-                <option value="REWORK">REWORK</option>
-                <option value="REJECTED">REJECTED</option>
+                <option value="ON_PROGRESS">ON_PROGRESS</option>
                 <option value="PENDING">PENDING</option>
-                <option value="APPROVEDBY1">APPROVEDBY1</option>
-                <option value="APPROVEDBY2">APPROVEDBY2</option>
+                <option value="REJECTED">REJECTED</option>
+                <option value="REWORK">REWORK</option>
+                <option value="APPROVE_BY_APPROVAL1">APPROVE_BY_APPROVAL1</option>
+                <option value="APPROVE_BY_APPROVAL2">APPROVE_BY_APPROVAL2</option>
                 {/* ... (other options) */}
               </select>
               <div className="mb-3 py-5 text-end">
