@@ -25,7 +25,7 @@ body {
   justify-content: center;
   height: 100vh;
   padding-top: 100px;
-}
+} 
 
 .box {
   background-color: var(--box-bg);
@@ -38,6 +38,3 @@ body {
   font-size: small;
 }
 
-.px-5.py-2.mt-2.mt-md-0.p-tag.p-component.p-tag-warning span {
-  size: 10%;
-}

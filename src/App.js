@@ -1,18 +1,14 @@
 import React from 'react';
-import './App.css';
-import AllServerDashboard from './Components/AllServerDashboard';
-import Create from './Components/Create';
-import Report from './Components/Report';
-import View from './Components/View';
+// import './App.css';
+import TemplateDemo from './Components/drop-file-input/DropFileInput';
+import PdfViewer from './Components/Text Editor/PdfViewer';
 
 function App() {
   return (
     <div>
       <h1>Grit Signature Module</h1>
-      <AllServerDashboard/>
-      <Create/>
-      <View/>
-      <Report/>
+      <TemplateDemo/>
+      <PdfViewer/>
     </div>
   );
 }

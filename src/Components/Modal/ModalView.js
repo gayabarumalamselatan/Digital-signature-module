@@ -5,16 +5,22 @@ import Modal from 'react-bootstrap/Modal';
 
 function ModalView() {
   const [show, setShow] = useState(false);
+  
   const [formData, setFormData] = useState({
-    Title: "",
-    Requestor: "",
-    RequestDate: "",
-    RequestTitle: "",
-    RequestDetail: "",
-    DueDate: "",
-    UserMaker: "",
-    UserApproval1: "",
-    UserApproval2: "",
+    id: "",
+    title: "",
+    nomor: "",
+    requestor: "",
+    requestDate: "",
+    requestTitle: "",
+    requestDetail: "",
+    createDate: "",
+    dueDate: "",
+    statusMemo: "",
+    userApproval1Note: "",
+    userApproval2Note: "",
+    userApproval1Name: "",
+    userApproval2Name: "",
   });
 
   const handleClose = () => setShow(false);
@@ -56,55 +62,57 @@ function ModalView() {
         View
       </Button>
 
-      <Modal show={show} onHide={handleClose} className='modal-xl'>
-        <Modal.Header closeButton>
-          <Modal.Title>View</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="my-4">
-            <ul className="row">
-              <li className="col-sm-3">Title</li>
-              <p className="col-sm-9">: {formData.Title}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">Requestor</li>
-              <p className="col-sm-9">: {formData.Requestor}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">Request Date</li>
-              <p className="col-sm-9">: {formData.RequestDate}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">Request Title</li>
-              <p className="col-sm-9">: {formData.RequestTitle}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">Request Detail</li>
-              <p className="col-sm-9">: {formData.RequestDetail}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">Due Date</li>
-              <p     className="col-sm-9">: {formData.DueDate}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">User Maker</li>
-              <p className="col-sm-9">: {formData.UserMaker}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">User Approval Pertama</li>
-              <p className="col-sm-9">: {formData.UserApproval1}</p>
-            </ul>
-            <ul className="row">
-              <li className="col-sm-3">User Approval Kedua</li>
-              <p className="col-sm-9">: {formData.UserApproval2}</p>
-            </ul>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleClose}>
-            Close
-          </Button>
-        </Modal.Footer>
+      <Modal show={show} onHide={handleClose} size='xl' scrollable={true}>
+
+          <Modal.Header closeButton>
+            <Modal.Title>View</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="my-4">
+              <ul className="row">
+                <li className="col-sm-3">Title</li>
+                <p className="col-sm-9">: {formData.Title}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">Requestor</li>
+                <p className="col-sm-9">: {formData.Requestor}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">Request Date</li>
+                <p className="col-sm-9">: {formData.RequestDate}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">Request Title</li>
+                <p className="col-sm-9">: {formData.RequestTitle}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">Request Detail</li>
+                <p className="col-sm-9">: {formData.RequestDetail}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">Due Date</li>
+                <p     className="col-sm-9">: {formData.DueDate}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">User Maker</li>
+                <p className="col-sm-9">: {formData.UserMaker}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">User Approval Pertama</li>
+                <p className="col-sm-9">: {formData.UserApproval1}</p>
+              </ul>
+              <ul className="row">
+                <li className="col-sm-3">User Approval Kedua</li>
+                <p className="col-sm-9">: {formData.UserApproval2}</p>
+              </ul>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={handleClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        
       </Modal>
     </>
   );

@@ -1,22 +1,29 @@
-import "primeflex/primeflex.css";
-import "primeicons/primeicons.css";
-import { Button } from "primereact/button";
-import { FileUpload } from "primereact/fileupload";
-import { Image } from "primereact/image";
-import { ProgressBar } from "primereact/progressbar";
-import "primereact/resources/primereact.css";
-import "primereact/resources/themes/lara-light-indigo/theme.css";
-import { Tag } from "primereact/tag";
+import React, { useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { Tooltip } from "primereact/tooltip";
-import React, { useRef, useState } from "react";
-import "./flags.css";
-import "./index.css";
+import { FileUpload } from "primereact/fileupload";
+import { ProgressBar } from "primereact/progressbar";
+import { Button } from "primereact/button";
+import { Image } from "primereact/image";
+import { Tag } from "primereact/tag";
+import axios from "axios";
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+import "./flags.css"; // Adjust the path if necessary
+import { getToken } from "../../config/Constant";
+import { MEMO_SERVICE_FILE_UPLOAD } from "../../config/ConfigUrl";
+import { styled } from "@mui/material";
+import { BorderColor, Margin } from "@mui/icons-material";
+// import "./index.css";
+
+const token = getToken();
 
 const TemplateDemo = () => {
   const toast = useRef(null);
   const fileUploadRef = useRef(null);
   const [totalSize, setTotalSize] = useState(0);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const maxFileSize = 25 * 1024 * 1024; // 25MB in bytes
   const allowedFileTypes = ["image/*", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
@@ -45,7 +52,7 @@ const TemplateDemo = () => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: `File size exceeds the limit of 25MB.`,
+        detail: "File size exceeds the limit of 25MB.",
       });
       setTotalSize(totalSize); // Restore previous total size
       e.originalEvent.preventDefault(); // Prevent file from being added
@@ -55,18 +62,51 @@ const TemplateDemo = () => {
     setTotalSize(_totalSize);
   };
 
-  const onTemplateUpload = (e) => {
-    let _totalSize = totalSize;
+  const onTemplateUpload = async () => {
+    const files = fileUploadRef.current.getFiles();
 
-    e.files.forEach((file) => {
-      _totalSize += file.size || 0;
+    if (files.length === 0) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "No files selected for upload.",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("file", file); // Ensure 'file' matches the expected key on the server
     });
 
-    setTotalSize(_totalSize);
-    toast.current.show({ severity: "info", summary: "Success", detail: "File Uploaded Successfully" });
+    try {
+      // Configure Axios request with Bearer token in Authorization header
+      const response = await axios.post(`${MEMO_SERVICE_FILE_UPLOAD}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    // Clear file list after upload completes
-    fileUploadRef.current.clear();
+      setTotalSize(0);
+      setUploadedFiles([...uploadedFiles, ...files]); // Add files to the uploaded list
+
+      toast.current.show({
+        severity: "info",
+        summary: "Success",
+        detail: "File Uploaded",
+      });
+
+      // Clear file list after upload completes
+      fileUploadRef.current.clear();
+    } catch (error) {
+      console.error("Upload error:", error.response || error.message || error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: `Failed to upload files: ${error.response?.data?.message || error.message}`,
+      });
+    }
   };
 
   const onTemplateRemove = (file, callback) => {
@@ -76,7 +116,6 @@ const TemplateDemo = () => {
 
   const onTemplateClear = () => {
     setTotalSize(0);
-    toast.current.show({ severity: "warn", summary: "Cleared", detail: "All files have been cleared" });
   };
 
   const headerTemplate = (options) => {
@@ -85,9 +124,18 @@ const TemplateDemo = () => {
     const formattedValue = fileUploadRef && fileUploadRef.current ? fileUploadRef.current.formatSize(totalSize) : "0 B";
 
     return (
-      <div className={className} style={{ backgroundColor: "transparent", display: "flex", alignItems: "center" }}>
+      <div
+        className={className}
+        style={{
+          backgroundColor: "transparent",
+          display: "flex",
+          alignItems: "center",
+          borderTopLeftRadius: "20px",
+          borderTopRightRadius: "20px"
+        }}
+      >
         {chooseButton}
-        {uploadButton}
+        <Button type="button" icon="pi pi-cloud-upload" className="rounded btn-success" onClick={onTemplateUpload} />
         {cancelButton}
         <div className="flex align-items-center gap-2 ml-auto">
           <span>{formattedValue} / 25 MB</span>
@@ -96,53 +144,82 @@ const TemplateDemo = () => {
       </div>
     );
   };
-
   const itemTemplate = (file, props) => {
     const fileType = file.type; // Get the file type
     let iconSource = ""; // Initialize icon source
 
     if (fileType === "application/pdf") {
-      iconSource = "assets/pdf.png"
- // Path to your PDF icon
+      iconSource = "/Icon/pdf.png"; // Path to your PDF icon
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-      iconSource = "assets/docx.png"; // Path to your DOCX icon
+      iconSource = "/Icon/docx.png"; // Path to your DOCX icon
     } else {
       iconSource = file.objectURL; // Default to image preview
     }
 
     return (
-      <div className="flex align-items-center flex-wrap" style={{ padding: "10px 5px", borderBottom: "1px solid #ccc" }}>
-        <div className="flex align-items-center" style={{ width: "100%" }}>
-          <Image src={iconSource} alt={file.name} width={100} preview />
+      <div className="flex align-items-center flex-wrap" style={{ padding: "10px 5px", borderBottom: "2px solid #ccc",}}>
+        <div className="d-flex align-items-center" style={{ width: "100%", borderBottomLeftRadius: '0px'  }}>
+          <img className="fileIcon" src="./icon/docx.png" alt=""  />
+          <br/> 
           <div className="flex flex-column text-left ml-3">
-            <span>{file.name}</span>
             <small>{new Date().toLocaleDateString()}</small>
+            <span>{file.name}</span>
           </div>
         </div>
-        <Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
-        <Button type="button" icon="pi pi-times" className="p-button-outlined p-button-rounded p-button-danger ml-auto mt-2 mt-md-0" onClick={() => onTemplateRemove(file, props.onRemove)} />
+        <Tag value={props.formatSize} severity="warning" className="px-3 me-2  py-2" />
+        <Button type="button" icon="pi pi-times" className="  rounded p-button-danger ml-auto mt-2 mt-md-0" onClick={() => onTemplateRemove(file, props.onRemove)} />
       </div>
     );
   };
 
   const emptyTemplate = () => {
     return (
-      <div className="flex align-items-center flex-column">
-        <i className="pi pi-image mt-3 p-5" style={{ fontSize: "5em", borderRadius: "50%", backgroundColor: "var(--surface-b)", color: "var(--surface-d)" }}></i>
-        <span style={{ fontSize: "1.2em", color: "var(--text-color-secondary)" }} className="my-5">
-          Drag and Drop PDF/Docx or Image Here
+      <div className="d-flex align-items-center justify-content-center flex-column">
+        <i
+          className="pi pi-image p-5"
+          style={{
+            fontSize: "2em",
+            borderRadius: "50%",
+            backgroundColor: "var(--surface-b)",
+            color: "var(--surface-d)",
+
+          }}
+        ></i>
+        <br/>
+        <span
+          className="mt-2"
+          style={{
+            fontSize: "1em",
+            color: "var(--text-color-secondary)",
+          }}
+        >
+          Drag and Drop PDF/Docx Here
         </span>
       </div>
     );
   };
 
-  const chooseOptions = { icon: "pi pi-fw pi-images", iconOnly: true, className: "custom-choose-btn p-button-rounded p-button-outlined" };
-  const uploadOptions = {
-    icon: "pi pi-fw pi-cloud-upload",
+  const chooseOptions = {
+    icon: "pi pi-fw pi-file-plus",
     iconOnly: true,
-    className: "custom-upload-btn p-button-success p-button-rounded p-button-outlined",
+    className: "custom-choose-btn ",
+    style: { 
+      backgroundColor: "#222273", 
+      borderColor: "#222273", 
+      color: "white",                
+      margin: "0",
+    }
   };
-  const cancelOptions = { icon: "pi pi-fw pi-times", iconOnly: true, className: "custom-cancel-btn p-button-danger p-button-rounded p-button-outlined" };
+  const uploadOptions = {
+    icon: "",
+    iconOnly: true,
+    className: "custom-upload-button rounded-4 ",
+  };
+  const cancelOptions = {
+    icon: "pi pi-fw pi-times",
+    iconOnly: true,
+    className: "custom-cancel-btn p-button-danger rounded",
+  };
 
   const isFileTypeAllowed = (fileType) => {
     return allowedFileTypes.some((type) => fileType.startsWith(type.replace("*", "")));
@@ -158,14 +235,12 @@ const TemplateDemo = () => {
 
       <FileUpload
         ref={fileUploadRef}
-        name="demo[]"
-        url="http://localhost:8080/api/submit"
+        name="File"
         multiple
         accept={allowedFileTypes.join(",")}
         maxFileSize={maxFileSize}
-        onUpload={onTemplateUpload}
         onSelect={onTemplateSelect}
-        onError={() => toast.current.show({ severity: "error", summary: "Error", detail: "File Upload Failed" })}
+        onError={onTemplateClear}
         onClear={onTemplateClear}
         headerTemplate={headerTemplate}
         itemTemplate={itemTemplate}
@@ -173,7 +248,20 @@ const TemplateDemo = () => {
         chooseOptions={chooseOptions}
         uploadOptions={uploadOptions}
         cancelOptions={cancelOptions}
+        customUpload
       />
+
+      <div className="uploaded-files">
+        <h2 className="card-title ms-4 mt-2 mb-3">Uploaded Files:</h2>
+        <br/>
+        <ul style={{marginTop: '5px'}}>
+          {uploadedFiles.map((file, index) => (
+            <li key={index}>
+              <span style={{ marginLeft: "5px" }}>{file.name}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

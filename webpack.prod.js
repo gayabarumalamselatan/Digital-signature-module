@@ -52,7 +52,9 @@ module.exports = {
             name: 'gritsignaturemodule',
             filename: 'signatureModule.js',
             exposes: {
-                './AllServerDownload': '.src/Components/AllServerDashboard'
+                './Create': '.src/Components/Create',
+                './View': '.src/Components/View',
+                './Report': '.src/Components/Report',
             },
             shared: {
                 react: { singleton: true, requiredVersion: '17.0.2' },
