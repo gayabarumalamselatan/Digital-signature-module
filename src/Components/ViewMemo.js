@@ -393,7 +393,7 @@ const ViewMemo = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const MySwal = withReactContent(Swal);
 
-  
+  // Buat get token ama userid
   const token = getToken();
   const userName = getUserName();
   
