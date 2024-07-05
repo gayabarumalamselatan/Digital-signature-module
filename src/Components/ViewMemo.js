@@ -373,7 +373,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ModalEdit from './Modal/ModalEdit'
-import { getToken } from "../config/Constant";
+import { getToken, getUserName } from "../config/Constant";
 import Swal from "sweetalert2";
 import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
@@ -392,9 +392,10 @@ const ViewMemo = () => {
   const [selectedMemo, setSelectedMemo] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const MySwal = withReactContent(Swal);
-  const token = getToken();
 
-  const userName = sessionStorage.getItem('userId');
+  
+  const token = getToken();
+  const userName = getUserName();
   
 
   // Buat ngambil token buat postman
