@@ -302,8 +302,8 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 disabled
               >
                 <option value="">Select an option</option>
-                <option value="Approve">Approve</option>
-                <option value="Reject">Reject</option>
+                <option value="Nama Approval 1 1">Nama Approval 1 1</option>
+                <option value="Nama Approval 1 2">Nama Approval 1 2</option>
               </select>
             </div>
 
@@ -320,8 +320,8 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 disabled
               >
                 <option value="">Select an option</option>
-                <option value="Approve">Approve</option>
-                <option value="Reject">Reject</option>
+                <option value="Nama Approval 2 1">Nama Approval 2 1</option>
+                <option value="Nama Approval 2 2">Nama Approval 2 2</option>
               </select>
             </div>
 
@@ -337,8 +337,12 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 onChange={handleChange}
               >
                 <option value="">Select an option</option>
-                <option value="Approve">Approve</option>
-                <option value="Reject">Reject</option>
+                <option value="ON_PROGRESS">ON_PROGRESS</option>
+                <option value="PENDING">PENDING</option>
+                <option value="REJECTED">REJECTED</option>
+                <option value="REWORK">REWORK</option>
+                <option value="APPROVE_BY_APPROVAL1">APPROVE_BY_APPROVAL1</option>
+                <option value="APPROVE_BY_APPROVAL2">APPROVE_BY_APPROVAL2</option>
               </select>
             </div>
 

@@ -87,10 +87,11 @@ function CreateMemo() {
             },
           }
         );
-    
+        
         MySwal.fire("Submitted!", "Your form has been submitted.", "success").then(() => {
           window.location.reload();
           // event.target.reset();
+          return response.data;
         });
       } catch (error) {
         MySwal.fire("Error!", "There was an error submitting the form.", "error");
@@ -183,7 +184,7 @@ function CreateMemo() {
         </div>
       </section>
       <section className="content">
-        <div className="card mx-2 px-4 pt-3">
+        <div className="card mx-2 px-4 pt-5">
           <div className="col-12">
             <form className="form-group" onSubmit={handleSubmit}>
               {renderInputField("Title", "title")}

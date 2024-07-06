@@ -32,13 +32,13 @@ const MemoReport = () => {
         headers: {
           Authorization:` Bearer ${token}`,
         },
-        params: {
-          due_date: formData.dueDate,
-          status_memo: formData.statusMemo,
-        },
+        // params: {
+        //   due_date: formData.dueDate,
+        //   status_memo: formData.statusMemo,
+        // },
       });
-
-      setFilteredData(response.data);
+      const sortedData = response.data.sort((a, b) => b.id - a.id);
+      setFilteredData(sortedData);
       setSearchError(""); // Reset search error message if successful
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -146,6 +146,7 @@ const MemoReport = () => {
                   <thead>
                     <tr>
                       <th scope="col">#</th>
+                      <th scope="col">Id</th>
                       <th scope="col">Title</th>
                       <th scope="col">Nomor</th>
                       <th scope="col">Requestor</th>
@@ -165,6 +166,7 @@ const MemoReport = () => {
                     {filteredData.map((item, index) => (
                       <tr key={index}>
                         <td scope="row">{index + 1}</td>
+                        <td>{item.id}</td>
                         <td>{item.title}</td>
                         <td>{item.nomor}</td>
                         <td>{item.requestor}</td>
