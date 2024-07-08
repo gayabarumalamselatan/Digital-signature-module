@@ -1,15 +1,16 @@
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react"; 
+import { useEffect, useState } from "react"; 
 import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DropFileInput from "./drop-file-input/DropFileInput";
 import { getToken } from "../config/Constant";
-import { MEMO_SERVICE_CREATE } from "../config/ConfigUrl";
+import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS } from "../config/ConfigUrl";
 
 const MySwal = withReactContent(Swal);
 const token = getToken();
+const headers = { Authorization: `Bearer ${token}`}
 
 function CreateMemo() {
   const [formData, setFormData] = useState({
@@ -29,6 +30,7 @@ function CreateMemo() {
     userApproval2Name: "",
   });
 
+  const [options, setOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -120,6 +122,7 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           onChange={handleChange} 
+          style={{width: "max-content", minWidth: "50%"}}
         />
         {errors[name] && <small className="text-danger">{errors[name]}</small>}
       </div>
@@ -138,11 +141,23 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           onChange={handleChange} 
+          style={{width: "max-content", minWidth: "50%"}}
         />
         {errors[name] && <small className="text-danger">{errors[name]}</small>}
       </div>
     </div>
   );
+
+  useEffect(() => {
+    axios.get(`${MEMO_SERVICE_GET_USER_LISTS}`, { headers })
+      .then(response => {
+        const usernames = response.data.map(user => user.userName);
+        setOptions(usernames);
+      })
+      .catch(error => {
+        console.error('error', error);
+      });
+  }, []);
 
   const renderSelectField = (label, name, options) => (
     <div className="row text-start mb-3">
@@ -150,11 +165,12 @@ function CreateMemo() {
         {label}:
       </label>
       <div className="col-10">
-        <select 
+        <select  
           className="form-select" 
           id={name} 
           name={name} 
           value={formData[name]} 
+          style={{width: "max-content", minWidth: "50%"}}
           onChange={handleChange}>
           <option value="">Select an option</option>
           {options.map(option => (
@@ -189,7 +205,7 @@ function CreateMemo() {
             <form className="form-group" onSubmit={handleSubmit}>
               {renderInputField("Title", "title")}
               {renderInputField("Nomor", "nomor")}
-              {renderSelectField("Requestor", "requestor", ["test 1", "test 2"])}
+              {renderSelectField("Requestor", "requestor", options )}
               {renderInputField("Request Date", "requestDate", "date")}
               {renderInputField("Request Title", "requestTitle")}
               {renderTextAreaField("Request Detail", "requestDetail")}
@@ -197,10 +213,11 @@ function CreateMemo() {
               {renderInputField("Create Date", "createDate", "date")}
               {renderInputField("Due Date", "dueDate", "date")}
               {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])}
+              {renderSelectField("User Maker", "userMaker", options)}
               {renderTextAreaField("User Approval 1 Note", "userApproval1Note")}
               {renderTextAreaField("User Approval 2 Note", "userApproval2Note")}
-              {renderSelectField("User Approval 1 Name", "userApproval1Name", ["Nama Approval 1 1", "Nama Approval 1 2"])}
-              {renderSelectField("User Approval 2 Name", "userApproval2Name", ["Nama Approval 2 1", "Nama Approval 2 2"])}
+              {renderSelectField("User Approval 1 Name", "userApproval1Name", options )}
+              {renderSelectField("User Approval 2 Name", "userApproval2Name", options )}
 
               <div className="container d-flex justify-content-center mt-4">
                 <div className="card" style={{ width: "500px", maxWidth: "50%", borderRadius: '20px' }}>

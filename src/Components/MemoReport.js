@@ -142,7 +142,7 @@ const MemoReport = () => {
           <div className="card py-5 mt-5">
             <div className="ms-5 me-5">
               <div className="table-responsive table-bordered">
-                <table className="table table-bordered rounded-3 table-striped">
+                <table className="table table-bordered rounded-3 table-striped border-bottom">
                   <thead>
                     <tr>
                       <th scope="col">#</th>

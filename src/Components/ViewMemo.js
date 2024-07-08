@@ -331,7 +331,7 @@ const ViewMemo = () => {
                 
               </div>
               <div className="table-responsive">
-                <table className="table table-bordered rounded-3 table-striped">
+                <table className="table table-bordered rounded-3 table-striped border-bottom" >
                   <thead>
                     <tr>
                       {/* Kolom id apus klo app udah jadi */}
@@ -356,9 +356,9 @@ const ViewMemo = () => {
                   <tbody>
                     {data.map((item, index) => (
                       <tr key={index}>
-                        <th>{index+1}</th>
+                        <td>{index+1}</td>
                         {/* Id apus klo udah jadi */}
-                        <th>{item.id}</th>
+                        <td>{item.id}</td>
                         <td>{item.title}</td>
                         <td>{item.nomor}</td>
                         <td>{item.requestor}</td>
