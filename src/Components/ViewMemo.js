@@ -7,7 +7,7 @@ import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { MEMO_SERVICE_DELETE, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
+import { MEMO_SERVICE_DELETE, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
 
 
 const ViewMemo = () => {
@@ -21,7 +21,7 @@ const ViewMemo = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const MySwal = withReactContent(Swal);
 
-  // Buat get token ama userid
+  // Buat get token & userid
   const token = getToken();
   const userName = getUserName();
   
@@ -37,6 +37,17 @@ const ViewMemo = () => {
   useEffect(() => {
     fetchData();
   }, [currentPage, pageSize]);
+
+
+  // Classic get method, show all data
+  // const fetchData = async ()=> {
+  //   try{
+  //     const response = await axios.get(`${MEMO_SERVICE_VIEW}`, {headers});
+  //     setData(response.data);
+  //   }catch(error){
+  //     console.error('error', error);
+  //   }
+  // }
 
 
   //Descending order (Id dari data terbaru)
@@ -62,8 +73,8 @@ const ViewMemo = () => {
     }
   };
 
-  // Urutan Ascending (Id dari 1)
 
+  // Urutan Ascending (Id dari 1)
   // const fetchData = async () => {
   //   try {
   //     let urlParams;
