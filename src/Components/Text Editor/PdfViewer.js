@@ -14,37 +14,65 @@
 //   const [error, setError] = useState("");
 //   const [loading, setLoading] = useState(false);
 //   const token = getToken();
-//   const headers = { Authorization: `Bearer ${token}` };
+//   const headers = { 
+//     Authorization: `Bearer ${token}`, 
+//     Accept: "application/json", // Expecting JSON response for the first request
+// };
 
-//   useEffect(() => {
-//     const fetchPdf = async () => {
-//       setLoading(true);
-//       try {
-//         const response = await axios.get("http://10.8.135.84:18080/internal-memo-service/form/listFilePath?id=83", {
-//           responseType: "blob",
-//           headers
-//         });
+// useEffect(() => {
+//     const fetchFilePath = async () => {
+//         setLoading(true);
+//         try {
+//             const response = await axios.get("http://10.8.135.84:18080/internal-memo-service/form/listFilePath?id=81", {
+//                 headers
+//             });
 
-//         // Verify the response data is a blob
-//         console.log("Response data:", response.data);
-
-//         const url = URL.createObjectURL(response.data);
-
-//         // Verify the created URL
-//         console.log("Created URL:", url);
-
-//         setPdfFile(url);
-//         setFileName("sample.pdf");
-//       } catch (error) {
-//         console.error("Error fetching PDF:", error);
-//         setError("Error loading PDF");
-//       } finally {
-//         setLoading(false);
-//       }
+//             // Verify the response data is an array with filePath
+//             console.log("Response data:", response.data);
+//             if (response.data && response.data.length > 0 && response.data[0].filePath) {
+//                 const filePath = response.data[0].filePath;
+//                 fetchPdf(filePath);
+//             } else {
+//                 throw new Error("Invalid response structure");
+//             }
+//         } catch (error) {
+//             console.error("Error fetching file path:", error);
+//             setError("Error loading file path");
+//             setLoading(false);
+//         }
 //     };
 
-//     fetchPdf();
-//   }, []);
+//     const fetchPdf = async (filePath) => {
+//         try {
+//             const pdfResponse = await axios.get(`http://10.8.135.84:18080${filePath}`, {
+//                 responseType: "blob",
+//                 headers: {
+//                     Authorization: `Bearer ${token}`, 
+//                     Accept: "application/pdf"
+//                 }
+//             });
+//             console.log(pdfResponse);
+//             // Verify the response data is a blob
+//             console.log("PDF response data type:", pdfResponse.data.type); // Should be "application/pdf"
+//             if (pdfResponse.data.type === "application/pdf") {
+//                 const url = URL.createObjectURL(pdfResponse.data);
+//                 // Verify the created URL
+//                 console.log("Created PDF URL:", url);
+//                 setPdfFile(url);
+//             } else {
+//                 throw new Error("Unexpected response type");
+//             }
+//         } catch (error) {
+//             console.error("Error fetching PDF:", error);
+//             setError("Error loading PDF");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     fetchFilePath();
+// }, []);
+
 
     
   
@@ -97,7 +125,7 @@
 
 
 
-//fetch locally
+// Fetch pdf locally
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";

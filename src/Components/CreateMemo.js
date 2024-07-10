@@ -38,6 +38,17 @@ function CreateMemo() {
     setSelectedFiles(files);
   };
 
+  useEffect(() => {
+    axios.get(`${MEMO_SERVICE_GET_USER_LISTS}`, { headers })
+      .then(response => {
+        const usernames = response.data.map(user => user.userName);
+        setOptions(usernames);
+      })
+      .catch(error => {
+        console.error('error', error);
+      });
+  }, []);
+
   const validateForm = () => {
     const requiredFields = [
       "title", "nomor", "requestor", "requestDate", "requestTitle", 
@@ -122,7 +133,7 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           onChange={handleChange} 
-          style={{width: "max-content", minWidth: "50%"}}
+          //style={{width: "max-content", minWidth: "50%"}}
         />
         {errors[name] && <small className="text-danger">{errors[name]}</small>}
       </div>
@@ -141,23 +152,12 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           onChange={handleChange} 
-          style={{width: "max-content", minWidth: "50%"}}
+          //style={{width: "max-content", minWidth: "50%"}}
         />
         {errors[name] && <small className="text-danger">{errors[name]}</small>}
       </div>
     </div>
   );
-
-  useEffect(() => {
-    axios.get(`${MEMO_SERVICE_GET_USER_LISTS}`, { headers })
-      .then(response => {
-        const usernames = response.data.map(user => user.userName);
-        setOptions(usernames);
-      })
-      .catch(error => {
-        console.error('error', error);
-      });
-  }, []);
 
   const renderSelectField = (label, name, options) => (
     <div className="row text-start mb-3">
@@ -200,7 +200,7 @@ function CreateMemo() {
         </div>
       </section>
       <section className="content">
-        <div className="card mx-2 px-4 pt-5">
+        <div className="card mx-3 px-4 pt-5">
           <div className="col-12">
             <form className="form-group" onSubmit={handleSubmit}>
               {renderInputField("Title", "title")}

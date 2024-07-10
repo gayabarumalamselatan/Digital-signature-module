@@ -68,11 +68,11 @@ const MemoReport = () => {
 
   return (
     <>
-      <section className="content-header pt-2">
+      <section className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="card-title">Memo Report</h1>
+              <h1 className>Memo Report</h1>
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
@@ -83,16 +83,17 @@ const MemoReport = () => {
           </div>
         </div>
       </section>
-      <div className="content mx-3">
-        <div className="card">
-          <div className="container mt-4 row justify-content-between gap-5">
-            <div className="mb-3 ms-5 col-md-5">
+      <div className="content">
+        <div className="card mx-3 px-4 pt-4">
+          <div className=" row ">
+            <div className="col-6">
               <label htmlFor="dueDate" className="form-label">
                 Due Date
               </label>
               <input type="date" className="form-control" id="dueDate" name="dueDate" value={formData.dueDate} onChange={handleChange} />
             </div>
-            <div className="mb-3 col-md-5" style={{ marginRight: "90px" }}>
+
+            <div className="col-6">
               <label htmlFor="statusMemo" className="form-label">
                 Status Memo
               </label>
@@ -139,7 +140,7 @@ const MemoReport = () => {
         )}
 
         {isSubmitted && !isLoading && filteredData.length > 0 && (
-          <div className="card py-5 mt-5">
+          <div className="card mx-3 py-5 mt-5">
             <div className="ms-5 me-5">
               <div className="table-responsive table-bordered">
                 <table className="table table-bordered rounded-3 table-striped border-bottom">

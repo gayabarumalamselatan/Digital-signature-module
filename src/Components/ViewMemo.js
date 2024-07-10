@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ModalEdit from './Modal/ModalEdit'
-import { getToken, getUserName } from "../config/Constant";
+import { getToken, getUserName, getUserId } from "../config/Constant";
 import Swal from "sweetalert2";
 import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
@@ -24,13 +24,15 @@ const ViewMemo = () => {
   // Buat get token & userid
   const token = getToken();
   const userName = getUserName();
+  const userId = getUserId();
   
 
   // Buat ngambil token buat postman
   // Apus klo app udah jadi
   const ngegettoken = sessionStorage.getItem('accessToken');
   console.log('token', ngegettoken);
-  console.log('USER',userName);
+  console.log('userId', userId);
+  console.log('UserName',userName);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -244,11 +246,11 @@ const ViewMemo = () => {
 
   return (
     <>
-      <section className="content-header pt-2">
+      <section className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="card-title">View Memo</h1>
+              <h1>View Memo</h1>
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
