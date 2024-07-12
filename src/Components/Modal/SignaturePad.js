@@ -39,12 +39,12 @@ const Signature = () => {
   }
 
   return (
-    <div className="container mt-5 px-0">
+    <div className="container px-0">
       <div className="card" style={cardStyle} >
         <div className="card-body"  style={cardBodyStyle}>
           <h5 className="card-title">Signature Canvas</h5>
           <SignatureCanvas ref={sigCanvas} style={boxShadowStyle} canvasProps={{ width: 400, height: 150, className: "sigCanvas" }} />
-          <div className="mt-3">
+          <div className="d-flex mt-3">
             <Button variant="danger" onClick={clear} style={{borderRadius:"15px"}} 
               onMouseOver={(e) => {
                 e.target.style.backgroundColor = "transparent";
@@ -61,6 +61,9 @@ const Signature = () => {
             <Button className="btn btn-primary ms-2" onClick={() => handleSave("png")}>
               Download  
             </Button>
+            <div className="ms-auto text-end mt-auto">
+            <p className="text-end me-2 mb-0 text-danger">(Optional)</p>
+            </div>
           </div>
         </div>
       </div>

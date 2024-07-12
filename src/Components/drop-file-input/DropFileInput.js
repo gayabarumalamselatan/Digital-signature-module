@@ -15,7 +15,7 @@ import { getToken } from "../../config/Constant";
 import { MEMO_SERVICE_FILE_UPLOAD } from "../../config/ConfigUrl";
 import { styled } from "@mui/material";
 import { BorderColor, Margin } from "@mui/icons-material";
-// import "./index.css";
+
 
 const token = getToken();
 
@@ -76,11 +76,10 @@ const TemplateDemo = () => {
 
     const formData = new FormData();
     files.forEach((file) => {
-      formData.append("file", file); // Ensure 'file' matches the expected key on the server
+      formData.append('file', file);
     });
 
     try {
-      // Configure Axios request with Bearer token in Authorization header
       const response = await axios.post(`${MEMO_SERVICE_FILE_UPLOAD}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -89,7 +88,7 @@ const TemplateDemo = () => {
       });
 
       setTotalSize(0);
-      setUploadedFiles([...uploadedFiles, ...files]); // Add files to the uploaded list
+      setUploadedFiles([...uploadedFiles, ...files]); 
 
       toast.current.show({
         severity: "info",
@@ -145,13 +144,13 @@ const TemplateDemo = () => {
     );
   };
   const itemTemplate = (file, props) => {
-    const fileType = file.type; // Get the file type
-     let icon;// Initialize icon source
+    const fileType = file.type; 
+     let icon;
 
     if (fileType === "application/pdf") {
-      icon = 'pi pi-file-pdf'; // Path to your PDF icon
+      icon = 'pi pi-file-pdf'; 
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-      icon = "pi pi-file-word"; // Path to your DOCX icon
+      icon = "pi pi-file-word"; 
     }
 
     return (

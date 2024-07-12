@@ -54,6 +54,7 @@ module.exports = {
                 './CreateMemo': './src/Components/CreateMemo',
                 './ViewMemo': './src/Components/ViewMemo',
                 './MemoReport': './src/Components/MemoReport',
+                './VerifyMemo': './src/Components/VerifyMemo',
             },
             shared: {
                 react: { singleton: true, eager: true, requiredVersion: '17.0.2' },

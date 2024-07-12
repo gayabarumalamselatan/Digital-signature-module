@@ -5,17 +5,19 @@ import Modal from "react-bootstrap/Modal";
 import PdfViewer from "../Text Editor/PdfViewer";
 import Signature from "./SignaturePad";
 import Swal from "sweetalert2";
-import { getToken } from "../../config/Constant";
-import { MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
+import { getToken, getUserId, getUserName, token } from "../../config/Constant";
+import { MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
 
-const ModalShow = ({ show, handleClose, fileName }) => (
+const userId = getUserId();
+const userName = getUserName();
+
+const ModalShow = ({ show, handleClose, fileName, filePath }) => (
   <Modal size="xl" show={show} onHide={handleClose} scrollable={true}>
     <Modal.Header closeButton>
       <Modal.Title>File Details</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <h1>PDF Viewer</h1>
-      <PdfViewer />
+      <PdfViewer fileName={fileName} filePath={filePath}/>
     </Modal.Body>
     <Modal.Footer>
       <Button variant="secondary" onClick={handleClose}>
@@ -26,6 +28,17 @@ const ModalShow = ({ show, handleClose, fileName }) => (
 );
 
 function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
+  const [showSignature, setShowSignature] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState("");
+  const [selectedFilePath, setSelectedFilePath] = useState("");
+  const [fileNames, setFileNames] = useState([]);
+  const [file, setFile] = useState(null);
+  const [isApproval1, setIsApproval1] = useState(false);
+  const [isApproval2, setIsApproval2] = useState(false);
+  const [isMaker, setIsMaker] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userNames, setUserNames] = useState([]);
   const [formData, setFormData] = useState({
     id: "",
     title: "",
@@ -42,11 +55,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
     userApproval1Name: "",
     userApproval2Name: "",
   });
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedFileName, setSelectedFileName] = useState("");
-  const [fileNames, setFileNames] = useState([]);
-  const [file, setFile] = useState(null);
+  const headers = { Authorization: `Bearer ${token}`};
 
   useEffect(() => {
     if (memo) {
@@ -60,7 +69,21 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
         fetchFileNames(memo.nomor);
       }
     }
-  }, [memo]);
+    setIsApproval1(userName === "digital_signature_approval1");
+    setIsApproval2(userName === "digital_signature_approval2");
+    setIsMaker(userName === "digital_signature_maker");
+    setIsAdmin(userName === "digital_signature_admin");
+    fetchUserNames();
+  }, [memo, userName]);
+
+   const fetchUserNames = async () => {
+      try {
+        const response = await axios.get(`${MEMO_SERVICE_GET_USER_LISTS}`, {headers});
+        setUserNames(response.data);
+      } catch (error) {
+        console.error('Error fetching user names:', error);
+      }
+    };
 
   const fetchFileNames = async (nomor) => {
     try {
@@ -73,7 +96,8 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
         fileId: nomor,
       };
       const response = await axios.get(`${MEMO_SERVICE_FORM_LIST}`, { headers, params });
-      setFileNames(response.data);
+      const filteredFiles = response.data.filter((item) => !item.fileName.toLowerCase().endsWith(".docx"));
+      setFileNames(filteredFiles);
     } catch (error) {
       console.error("Error fetching file names:", error);
     }
@@ -154,12 +178,18 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
     });
   };
 
-  const handleOpenModal = (fileName) => {
+  const handleOpenModal = (fileName, filePath) => {
     setSelectedFileName(fileName);
+    setSelectedFilePath(filePath)
     setShowModal(true);
   };
 
   const handleCloseModal = () => setShowModal(false);
+  const handleSignatureCheckboxChange = () => {
+    setShowSignature(!showSignature);
+  };
+
+  console.log('userId: ', userId);
 
   return (
     <>
@@ -195,7 +225,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -210,7 +240,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="nomor"
                 value={formData.nomor}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -225,7 +255,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="requestor"
                 value={formData.requestor}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -240,7 +270,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="requestDate"
                 value={formData.requestDate}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -255,7 +285,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="requestTitle"
                 value={formData.requestTitle}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -270,7 +300,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="createDate"
                 value={formData.createDate}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -285,7 +315,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               />
             </div>
 
@@ -299,12 +329,16 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="userApproval1Name"
                 value={formData.userApproval1Name}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               >
                 <option value="">Select an option</option>
-                <option value="Nama Approval 1 1">Nama Approval 1 1</option>
-                <option value="Nama Approval 1 2">Nama Approval 1 2</option>
+                {userNames.map((user, index) => (
+                  <option key={index} value={user.userName}>
+                    {user.userName.toUpperCase()}
+                  </option>
+                ))}
               </select>
+              
             </div>
 
             <div className="col-md-6">
@@ -317,11 +351,14 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="userApproval2Name"
                 value={formData.userApproval2Name}
                 onChange={handleChange}
-                disabled
+                disabled={!isMaker && !isAdmin}
               >
                 <option value="">Select an option</option>
-                <option value="Nama Approval 2 1">Nama Approval 2 1</option>
-                <option value="Nama Approval 2 2">Nama Approval 2 2</option>
+                {userNames.map((user, index) => (
+                  <option key={index} value={user.userName}>
+                    {user.userName.toUpperCase()}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -335,6 +372,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="statusMemo"
                 value={formData.statusMemo}
                 onChange={handleChange}
+                disabled = {!isAdmin &&!isApproval1 && !isApproval2}
               >
                 <option value="">Select an option</option>
                 <option value="ON_PROGRESS">ON_PROGRESS</option>
@@ -356,7 +394,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="requestDetail"
                 value={formData.requestDetail}
                 onChange={handleChange}
-                disabled
+                disabled = {!isMaker && !isAdmin}
               />
             </div>
 
@@ -370,6 +408,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="userApproval1Note"
                 value={formData.userApproval1Note}
                 onChange={handleChange}
+                disabled={!isAdmin && !isApproval1}
               />
             </div>
 
@@ -383,6 +422,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="userApproval2Note"
                 value={formData.userApproval2Note}
                 onChange={handleChange}
+                disabled={!isAdmin && !isApproval2}
               />
             </div>
 
@@ -411,7 +451,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                         {/* Id apus klo udh jalan */}
                         <td>{item.id}</td>
                         <td style={{borderRight: 'none'}}>
-                          <a href="#" onClick={() => handleOpenModal(item.fileName)}>
+                          <a href="#" onClick={() => handleOpenModal(item.fileName, item.filePath)}>
                             {item.fileName}
                           </a>
                         </td>
@@ -421,9 +461,25 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 </table>
               </div>
             </div>
-            <div className="col-md-6 mt-0">
-              <Signature />
+            <div className="col-md-6 ">
+              <div className="ms-4 mt-4">
+                <input 
+                type="checkbox" 
+                className="form-check-input" 
+                checked={showSignature} 
+                onChange={handleSignatureCheckboxChange} 
+                />
+                <label className="form-check-label text-danger">
+                  Check to include signature (optional).
+                </label>
+              </div>
+              {showSignature && (
+                <div className="mt-2">
+                  <Signature />
+                </div>
+              )}
             </div>
+
           </form>
         </Modal.Body>
         <Modal.Footer>
@@ -436,7 +492,12 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
         </Modal.Footer>
       </Modal>
 
-      <ModalShow show={showModal} handleClose={handleCloseModal} />
+      <ModalShow 
+        show={showModal} 
+        handleClose={handleCloseModal} 
+        fileName={selectedFileName}
+        filePath={selectedFilePath}
+      />
     </>
   );
 }

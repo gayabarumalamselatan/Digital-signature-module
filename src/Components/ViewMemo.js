@@ -279,9 +279,8 @@ const ViewMemo = () => {
                         style={{ marginRight: "5px" }}
                       >
                         <option value="">Choose Filter</option>
-                        <option value="username">Username</option>
-                        <option value="activity">Activity</option>
-                        <option value="createdDate">Created Date</option>
+                        <option value="nomor">Nomor</option>
+                        <option value="title">Title</option>
                       </select>
                       <input
                         type="text"
