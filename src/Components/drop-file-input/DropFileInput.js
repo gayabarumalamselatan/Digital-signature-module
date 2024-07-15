@@ -134,7 +134,7 @@ const TemplateDemo = () => {
         }}
       >
         {chooseButton}
-        <Button type="button" icon="pi pi-cloud-upload" className="rounded btn-success" onClick={onTemplateUpload} />
+        <Button type="button" icon="pi pi-cloud-upload" className="rounded btn-success upload" onClick={onTemplateUpload} />
         {cancelButton}
         <div className="flex align-items-center gap-2 ml-auto">
           <span>{formattedValue} / 25 MB</span>
@@ -227,7 +227,7 @@ const TemplateDemo = () => {
       <Toast ref={toast}></Toast>
 
       <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
-      <Tooltip target=".custom-upload-btn" content="Upload" position="bottom" />
+      <Tooltip target=".upload" content="Upload" position="bottom" />
       <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
 
       <FileUpload

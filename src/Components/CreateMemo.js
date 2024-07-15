@@ -203,13 +203,14 @@ function CreateMemo() {
         <div className="card mx-3 px-4 pt-5">
           <div className="col-12">
             <form className="form-group" onSubmit={handleSubmit}>
+              
               {renderInputField("Title", "title")}
+              {renderSelectField("Tipe Dokumen", "tipeDokumen", ["BAST", "Klaim Kesehatan", "RO PO", "Lain-lain"])}
               {renderInputField("Nomor", "nomor")}
               {renderSelectField("Requestor", "requestor", options )}
               {renderInputField("Request Date", "requestDate", "date")}
               {renderInputField("Request Title", "requestTitle")}
               {renderTextAreaField("Request Detail", "requestDetail")}
-              {renderSelectField("Tipe Dokumen", "tipeDokumen", ["BAST", "Klaim Kesehatan", "RO PO", "Lain-lain"])}
               {renderInputField("Create Date", "createDate", "date")}
               {renderInputField("Due Date", "dueDate", "date")}
               {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])}

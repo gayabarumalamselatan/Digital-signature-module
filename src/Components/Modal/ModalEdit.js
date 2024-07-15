@@ -338,7 +338,6 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                   </option>
                 ))}
               </select>
-              
             </div>
 
             <div className="col-md-6">

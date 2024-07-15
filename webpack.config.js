@@ -33,6 +33,11 @@ module.exports = {
                 },
             },
             {
+                test: /\.mjs$/,
+                include: /node_modules/,
+                type: 'javascript/auto'
+            },
+            {
                 test: /\.css$/,
                 use: [
                     "style-loader", // Creates `style` nodes from JS strings
