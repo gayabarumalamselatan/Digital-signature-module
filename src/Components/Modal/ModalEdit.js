@@ -439,7 +439,6 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                   <thead>
                     <tr>
                       <th scope="col" style={{borderLeft:'none'}}>No</th>
-                      <th scope="col">Id</th>
                       <th scope="col" style={{borderRight: 'none'}}>Nama File</th>
                     </tr>
                   </thead>
@@ -447,8 +446,6 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                     {fileNames.map((item, index) => (
                       <tr key={index}>
                         <td style={{borderLeft:'none'}}>{index + 1}</td>
-                        {/* Id apus klo udh jalan */}
-                        <td>{item.id}</td>
                         <td style={{borderRight: 'none'}}>
                           <a href="#" onClick={() => handleOpenModal(item.fileName, item.filePath)}>
                             {item.fileName}

@@ -337,7 +337,6 @@ const ViewMemo = () => {
                     <tr>
                       {/* Kolom id apus klo app udah jadi */}
                       <th scope="col">#</th>
-                      <th scope="col">Id</th>
                       <th scope="col">Title</th>
                       <th scope="col">Nomor</th>
                       <th scope="col">Requestor</th>
@@ -358,8 +357,6 @@ const ViewMemo = () => {
                     {data.map((item, index) => (
                       <tr key={index}>
                         <td>{index+1}</td>
-                        {/* Id apus klo udah jadi */}
-                        <td>{item.id}</td>
                         <td>{item.title}</td>
                         <td>{item.nomor}</td>
                         <td>{item.requestor}</td>
