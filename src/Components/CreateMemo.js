@@ -5,37 +5,70 @@ import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DropFileInput from "./drop-file-input/DropFileInput";
-import { getToken } from "../config/Constant";
+import { getToken, getUserId, getUserName } from "../config/Constant";
 import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS } from "../config/ConfigUrl";
+import { Button } from "react-bootstrap";
 
 const MySwal = withReactContent(Swal);
 const token = getToken();
+const gettingUserName = getUserName();
+const gettingUserId = getUserId();
 const headers = { Authorization: `Bearer ${token}`}
 
 function CreateMemo() {
   const [formData, setFormData] = useState({
-    title: "",
+    title: "Internal Memo",
     nomor: "",
     requestor: "",
     requestDate: "",
     requestTitle: "",
     requestDetail: "",
-    //tipeDokumen:"",
+    tipeDokumen:"BAST",
     createDate: "",
     dueDate: "",
     statusMemo: "",
+    userMaker: "",
     userApproval1Note: "",  
     userApproval2Note: "",
     userApproval1Name: "",
     userApproval2Name: "",
+    userId: gettingUserId,
   });
+
 
   const [options, setOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [fileError, setFileError] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const handleFileChange = (files) => {
     setSelectedFiles(files);
+    
+  };
+
+  const handleCancel = (event) => {
+    event.preventDefault();
+    const currentDate = new Date().toISOString().split('T')[0];
+    setFormData({
+      title: "Internal Memo",
+      nomor: "",
+      requestor: "",
+      requestDate: currentDate,
+      requestTitle: "",
+      requestDetail: "",
+      tipeDokumen: "BAST",
+      createDate: "",
+      dueDate: "",
+      statusMemo: "",
+      userMaker: "",
+      userApproval1Note: "",  
+      userApproval2Note: "",
+      userApproval1Name: "",
+      userApproval2Name: "",
+    });
+    setSelectedFiles([]);
+    setErrors({});
   };
 
   useEffect(() => {
@@ -47,21 +80,29 @@ function CreateMemo() {
       .catch(error => {
         console.error('error', error);
       });
+
+    const currentDate = new Date().toISOString().split('T')[0];
+    setFormData((prevData) => ({
+      ...prevData,
+      requestDate: currentDate,
+    }));
   }, []);
 
   const validateForm = () => {
     const requiredFields = [
-      "title", "nomor", "requestor", "requestDate", "requestTitle", 
-      "requestDetail", "createDate", "dueDate", "statusMemo", 
-      "userApproval1Note", "userApproval2Note", 
-      "userApproval1Name", "userApproval2Name"
+      "title", "tipeDokumen", "nomor", "requestor", "requestDate", "requestTitle", 
+      "requestDetail", "createDate", "dueDate", "statusMemo", "userMaker", "userApproval1Name", "userApproval2Name", 
     ];
     const newErrors = {};
     
     requiredFields.forEach(field => {
       if (!formData[field]) newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required!`;
     });
-    
+
+    if (fileError || uploadedFiles.length === 0) {
+      setFileError(true);
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -102,7 +143,7 @@ function CreateMemo() {
         );
         
         MySwal.fire("Submitted!", "Your form has been submitted.", "success").then(() => {
-          window.location.reload();
+          handleCancel(event);
           // event.target.reset();
           return response.data;
         });
@@ -120,7 +161,7 @@ function CreateMemo() {
     }));
   };
   
-  const renderInputField = (label, name, type = "text") => (
+  const renderInputField = (label, name, type = "text", disabled= false) => (
     <div className="row text-start mb-3">
       <label htmlFor={name} className="col-2 col-form-label">
         {label}:
@@ -133,14 +174,14 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           onChange={handleChange} 
-          //style={{width: "max-content", minWidth: "50%"}}
+          disabled={gettingUserName !== 'digital_signature_admin' && gettingUserName === 'digital_signature_maker' && disabled}
         />
         {errors[name] && <small className="text-danger">{errors[name]}</small>}
       </div>
     </div>
   );
 
-  const renderTextAreaField = (label, name) => (
+  const renderTextAreaField = (label, name, disabled = false) => (
     <div className="row text-start mb-3">
       <label htmlFor={name} className="col-2 col-form-label">
         {label}:
@@ -152,6 +193,7 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           onChange={handleChange} 
+          disabled={gettingUserName !== 'digital_signature_admin' && gettingUserName === 'digital_signature_maker' && disabled}
           //style={{width: "max-content", minWidth: "50%"}}
         />
         {errors[name] && <small className="text-danger">{errors[name]}</small>}
@@ -159,7 +201,7 @@ function CreateMemo() {
     </div>
   );
 
-  const renderSelectField = (label, name, options) => (
+  const renderSelectField = (label, name, options, disabled = false) => (
     <div className="row text-start mb-3">
       <label htmlFor={name} className="col-2 col-form-label">
         {label}:
@@ -171,6 +213,7 @@ function CreateMemo() {
           name={name} 
           value={formData[name]} 
           style={{width: "max-content", minWidth: "50%"}}
+          disabled={gettingUserName !== 'digital_signature_admin' && gettingUserName === 'digital_signature_maker' && disabled}
           onChange={handleChange}>
           <option value="">Select an option</option>
           {options.map(option => (
@@ -204,8 +247,8 @@ function CreateMemo() {
           <div className="col-12">
             <form className="form-group" onSubmit={handleSubmit}>
               
-              {renderInputField("Title", "title")}
-              {renderSelectField("Tipe Dokumen", "tipeDokumen", ["BAST", "Klaim Kesehatan", "RO PO", "Lain-lain"])}
+              {renderInputField("Title", "title", "text", true)}
+              {renderSelectField("Tipe Dokumen", "tipeDokumen", ["BAST", "Klaim Kesehatan", "PR PO", "Lain-lain"])}
               {renderInputField("Nomor", "nomor")}
               {renderSelectField("Requestor", "requestor", options )}
               {renderInputField("Request Date", "requestDate", "date")}
@@ -215,18 +258,29 @@ function CreateMemo() {
               {renderInputField("Due Date", "dueDate", "date")}
               {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])}
               {renderSelectField("User Maker", "userMaker", options)}
-              {renderTextAreaField("User Approval 1 Note", "userApproval1Note")}
-              {renderTextAreaField("User Approval 2 Note", "userApproval2Note")}
-              {renderSelectField("User Approval 1 Name", "userApproval1Name", options )}
-              {renderSelectField("User Approval 2 Name", "userApproval2Name", options )}
+              {renderTextAreaField("User Approval 1 Note", "userApproval1Note", true)}
+              {renderTextAreaField("User Approval 2 Note", "userApproval2Note", true)}
+              {renderSelectField("User Approval 1 Name", "userApproval1Name", options,  )}
+              {renderSelectField("User Approval 2 Name", "userApproval2Name", options,  )}
 
               <div className="container d-flex justify-content-center mt-4">
                 <div className="card" style={{ width: "500px", maxWidth: "50%", borderRadius: '20px' }}>
-                  <DropFileInput onFileChange={handleFileChange} />
+                  <DropFileInput 
+                    onFileChange={handleFileChange}
+                    setFileError={setFileError}
+                    uploadedFiles={uploadedFiles}
+                    setUploadedFiles={setUploadedFiles}
+                    fileError={fileError}
+                  />
+                  {errors.file && <small className="text-danger">{errors.file}</small>}
                 </div>
               </div>
+              
 
-              <div className="mb-3 text-end p-5">
+              <div className="mb-3 text-end p-5 d-flex text-end justify-content-end gap-2">
+                <button className="btn btn-secondary" onClick={handleCancel}>
+                  Reset
+                </button>
                 <button className="btn btn-primary" type="submit">
                   Submit
                 </button>

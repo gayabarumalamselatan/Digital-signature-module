@@ -57,6 +57,8 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
   });
   const headers = { Authorization: `Bearer ${token}`};
 
+  console.log("userId: ",userId);
+
   useEffect(() => {
     if (memo) {
       setFormData({
@@ -147,6 +149,8 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
             data.append(key, formData[key]);
           });
 
+          data.set("userId", userId);
+
           if (file) {
             data.append("file", file);
           }
@@ -188,8 +192,6 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
   const handleSignatureCheckboxChange = () => {
     setShowSignature(!showSignature);
   };
-
-  console.log('userId: ', userId);
 
   return (
     <>
@@ -329,7 +331,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="userApproval1Name"
                 value={formData.userApproval1Name}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={!isMaker && !isAdmin }
               >
                 <option value="">Select an option</option>
                 {userNames.map((user, index) => (
@@ -350,7 +352,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 name="userApproval2Name"
                 value={formData.userApproval2Name}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={!isMaker && !isAdmin }
               >
                 <option value="">Select an option</option>
                 {userNames.map((user, index) => (

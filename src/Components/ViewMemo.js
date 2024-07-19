@@ -30,9 +30,9 @@ const ViewMemo = () => {
   // Buat ngambil token buat postman
   // Apus klo app udah jadi
   const ngegettoken = sessionStorage.getItem('accessToken');
-  console.log('token', ngegettoken);
-  console.log('userId', userId);
-  console.log('UserName',userName);
+  // console.log('token', ngegettoken);
+  // console.log('userId', userId);
+  // console.log('UserName',userName);
 
   const headers = { Authorization: `Bearer ${token}` };
 

@@ -142,7 +142,7 @@ const MemoReport = () => {
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item"><a href="/user">Home</a></li>
-                <li className="breadcrumb-item active">View Memo</li>
+                <li className="breadcrumb-item active">Memo Report</li>
               </ol>
             </div>
           </div>

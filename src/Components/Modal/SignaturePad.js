@@ -58,9 +58,9 @@ const Signature = () => {
               }} >
               Clear
             </Button>
-            <Button className="btn btn-primary ms-2" onClick={() => handleSave("png")}>
+            {/* <Button className="btn btn-primary ms-2" onClick={() => handleSave("png")}>
               Download  
-            </Button>
+            </Button> */}
             <div className="ms-auto text-end mt-auto">
             <p className="text-end me-2 mb-0 text-danger">(Optional)</p>
             </div>

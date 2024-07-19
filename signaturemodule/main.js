@@ -15,7 +15,7 @@
   \**********************/
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("// Dynamically import the bootstrap file\nPromise.all(/*! import() */[__webpack_require__.e(\"vendors-node_modules_process_browser_js-node_modules_bootstrap_dist_css_bootstrap_min_css-nod-f811dd\"), __webpack_require__.e(\"vendors-node_modules_primereact_button_button_esm_js\"), __webpack_require__.e(\"vendors-node_modules_dom-helpers_esm_addClass_js-node_modules_dom-helpers_esm_removeClass_js--753b4d\"), __webpack_require__.e(\"vendors-node_modules_primereact_fileupload_fileupload_esm_js-node_modules_primereact_tag_tag_-13cca6\"), __webpack_require__.e(\"vendors-node_modules_react-pdf-viewer_default-layout_lib_index_js-node_modules_react-bootstra-03b965\"), __webpack_require__.e(\"webpack_sharing_consume_default_react-dom_react-dom\"), __webpack_require__.e(\"src_Components_drop-file-input_DropFileInput_js-data_image_svg_xml_3csvg_xmlns_27http_www_w3_-98dd57\"), __webpack_require__.e(\"src_bootstrap_js\")]).then(__webpack_require__.bind(__webpack_require__, /*! ./bootstrap */ \"./src/bootstrap.js\")).catch(err => console.error(err));\n\n//# sourceURL=webpack://new-module-grit-front-end/./src/index.js?");
+eval("// Dynamically import the bootstrap file\nPromise.all(/*! import() */[__webpack_require__.e(\"vendors-node_modules_process_browser_js-node_modules_bootstrap_dist_css_bootstrap_min_css-nod-f811dd\"), __webpack_require__.e(\"vendors-node_modules_react-pdf-viewer_default-layout_lib_index_js-node_modules_react-bootstra-aeb33b\"), __webpack_require__.e(\"vendors-node_modules_ant-design_icons_es_icons_InboxOutlined_js-node_modules_antd_es_alert_in-6e3e89\"), __webpack_require__.e(\"webpack_sharing_consume_default_react-dom_react-dom\"), __webpack_require__.e(\"src_Components_drop-file-input_DropFileInput_js-data_image_svg_xml_3csvg_xmlns_27http_www_w3_-98dd57\"), __webpack_require__.e(\"src_bootstrap_js\")]).then(__webpack_require__.bind(__webpack_require__, /*! ./bootstrap */ \"./src/bootstrap.js\")).catch(err => console.error(err));\n\n//# sourceURL=webpack://new-module-grit-front-end/./src/index.js?");
 
 /***/ }),
 
@@ -177,6 +177,21 @@ eval("\n\nif (false) {} else {\n  module.exports = __webpack_require__(/*! ./cjs
 /******/ 				if (typeof window === 'object') return window;
 /******/ 			}
 /******/ 		})();
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/harmony module decorator */
+/******/ 	(() => {
+/******/ 		__webpack_require__.hmd = (module) => {
+/******/ 			module = Object.create(module);
+/******/ 			if (!module.children) module.children = [];
+/******/ 			Object.defineProperty(module, 'exports', {
+/******/ 				enumerable: true,
+/******/ 				set: () => {
+/******/ 					throw new Error('ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: ' + module.id);
+/******/ 				}
+/******/ 			});
+/******/ 			return module;
+/******/ 		};
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
