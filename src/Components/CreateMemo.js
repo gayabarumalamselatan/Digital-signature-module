@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DropFileInput from "./drop-file-input/DropFileInput";
 import { getToken, getUserId, getUserName } from "../config/Constant";
-import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS } from "../config/ConfigUrl";
+import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_USERNAME_LISTS } from "../config/ConfigUrl";
 import { Button } from "react-bootstrap";
 
 const MySwal = withReactContent(Swal);
@@ -37,6 +37,7 @@ function CreateMemo() {
 
 
   const [options, setOptions] = useState([]);
+  const [newOptions, setNewOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileError, setFileError] = useState(false);
@@ -72,9 +73,10 @@ function CreateMemo() {
   };
 
   useEffect(() => {
-    axios.get(`${MEMO_SERVICE_GET_USER_LISTS}`, { headers })
+    const params = 'username&status&page=0&size=500';
+    axios.get(`${MEMO_SERVICE_USERNAME_LISTS}?${params}`, { headers })
       .then(response => {
-        const usernames = response.data.map(user => user.userName);
+        const usernames = response.data.users.map(user => user.userName);
         setOptions(usernames);
       })
       .catch(error => {
@@ -100,12 +102,26 @@ function CreateMemo() {
     });
 
     if (fileError || uploadedFiles.length === 0) {
-      setFileError(true);
+      newErrors.file = setFileError(true);
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const validateField = () => {
+    const requiredFields = [
+      "title", "tipeDokumen", "nomor", "requestor", "requestDate", "requestTitle", 
+      "requestDetail", "createDate", "dueDate", "statusMemo", "userMaker", "userApproval1Name", "userApproval2Name", 
+    ];
+    const newErrors = {};
+    
+    requiredFields.forEach(field => {
+      if (!formData[field]) newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required!`;
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -144,7 +160,7 @@ function CreateMemo() {
         
         MySwal.fire("Submitted!", "Your form has been submitted.", "success").then(() => {
           handleCancel(event);
-          // event.target.reset();
+          setUploadedFiles([]);
           return response.data;
         });
       } catch (error) {
@@ -235,7 +251,7 @@ function CreateMemo() {
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
-                <li className="breadcrumb-item"><a href="/user">Home</a></li>
+                <li className="breadcrumb-item"><a href="/">Home</a></li>
                 <li className="breadcrumb-item active">Create Memo</li>
               </ol>
             </div>
@@ -271,6 +287,8 @@ function CreateMemo() {
                     uploadedFiles={uploadedFiles}
                     setUploadedFiles={setUploadedFiles}
                     fileError={fileError}
+                    resetUploadedFiles={handleSubmit}
+                    validateField={validateField}
                   />
                   {errors.file && <small className="text-danger">{errors.file}</small>}
                 </div>

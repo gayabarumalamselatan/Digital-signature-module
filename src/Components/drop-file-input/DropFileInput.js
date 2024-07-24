@@ -1,20 +1,34 @@
-import React, { useState } from "react";
-import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
-import { message, Upload, Progress, Button, Form, Alert } from "antd";
+import React, { useEffect, useState } from "react";
+import { InboxOutlined, DeleteOutlined, FileOutlined, EyeOutlined } from "@ant-design/icons";
+import { message, Upload, Progress, Button, Form, Alert, List, Tooltip } from "antd";
 import axios from "axios";
 import { MEMO_SERVICE_FILE_UPLOAD } from "../../config/ConfigUrl";
 import { getToken } from "../../config/Constant";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 
 const { Dragger } = Upload;
+const MySwal = withReactContent(Swal);
 
-const DropFileInput = ({uploadedFiles, setUploadedFiles, fileError, setFileError}) => {
+const DropFileInput = ({validateField, uploadedFiles, setUploadedFiles, fileError, setFileError, resetUploadFiles}) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fileList, setFileList] = useState([]);
-  //const [fileError, setFileError] = useState(false);
- 
+  const [uploadedFileObjects, setUploadedFileObjects] = useState([]);
+
+  useEffect(()=>{
+    if(resetUploadFiles){
+      setUploadedFiles([]);
+      setUploadedFileObjects([]);
+    }
+  },[resetUploadFiles]);
 
   const handleUpload = () => {
+    if(!validateField()){
+      MySwal.fire("Error!", "Please fill all required fields above.", "error");
+      return;
+    }
+
     if (fileList.length === 0) {
       setFileError(true);
       return;
@@ -50,6 +64,7 @@ const DropFileInput = ({uploadedFiles, setUploadedFiles, fileError, setFileError
         message.success("File uploaded successfully.");
         setFileList([]); // Clear file list after successful upload
         setUploadedFiles([...uploadedFiles, fileList[0].name]);
+        setUploadedFileObjects([...uploadedFileObjects, fileList[0]]);
       })
       .catch((error) => {
         console.error("Upload failed:", error);
@@ -124,7 +139,7 @@ const DropFileInput = ({uploadedFiles, setUploadedFiles, fileError, setFileError
   };
 
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
+    <div style={{ padding: "20px", textAlign: "center", borderRadius: "20px"}}>
       <div style={{ display: "inline-block", width: "100%" }}>
         <Dragger {...props}>
           <p className="ant-upload-drag-icon">
@@ -135,11 +150,11 @@ const DropFileInput = ({uploadedFiles, setUploadedFiles, fileError, setFileError
           {uploading && <Progress percent={progress} indicating size="small" active />}
         </Dragger>
       </div>
-      {fileError && <Alert message="Warning" description="You must upload a document before proceeding." type="warning" showIcon style={{ marginTop: 20 }} />}
+      {fileError && <Alert message="Warning" description="Upload a document first before submitting." type="warning" showIcon style={{ marginTop: 20 }} />}
       <Button type="primary" onClick={handleUpload} disabled={uploading} loading={uploading} style={{ marginTop: 30 }}>
         {uploading ? "Uploading" : "Upload"}
       </Button>
-      {uploadedFiles.length > 0 && (
+      {/* {uploadedFiles.length > 0 && (
         <div className="justify-content-start text-start" style={{ marginTop: 20 }}>
           <h4>Uploaded Files:</h4>
           <ul>
@@ -148,6 +163,31 @@ const DropFileInput = ({uploadedFiles, setUploadedFiles, fileError, setFileError
             ))}
           </ul>
         </div>
+      )} */}
+      
+      {uploadedFiles.length > 0 && (
+        <List
+          header={<div>Uploaded Files</div>}
+          bordered
+          dataSource={uploadedFiles.map((file) => ({ name: file, file: uploadedFileObjects.find((f) => f.name === file) }))}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <Tooltip title="Preview" key="preview">
+                  <EyeOutlined onClick={() => window.open(URL.createObjectURL(item.file))} />
+                </Tooltip>,
+                <Tooltip title="Download" key="download">
+                  <a href={URL.createObjectURL(item.file)} download={item.name}>
+                    <FileOutlined />
+                  </a>
+                </Tooltip>,
+              ]}
+            >
+              <List.Item.Meta avatar={<FileOutlined />} title={item.name} description={`File size: ${(item.file.size / 1024 / 1024).toFixed(2)} MB`} />
+            </List.Item>
+          )}
+          style={{ marginTop: 20 }}
+        />
       )}
     </div>
   );

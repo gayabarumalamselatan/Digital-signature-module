@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import PdfViewer from "../Text Editor/PdfViewer";
+import PdfViewer from "../PdfViewer/PdfViewer";
 import Signature from "./SignaturePad";
 import Swal from "sweetalert2";
 import { getToken, getUserId, getUserName, token } from "../../config/Constant";
@@ -432,22 +432,22 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 File Names
               </label>
 
-              <div className=" table-responsive " style={{border:'none'}}>
+              <div className="table-responsive " style={{border:'none', minWidth: ""}}>
                 <table className="table table-bordered" style={{ 
-                  minWidth: "max-content", 
                   borderRadius: "20px",  
-                  overflow: "hidden"      
+                  overflow: "hidden",
+                  tableLayout: "auto"      
                 }}>
                   <thead>
                     <tr>
-                      <th scope="col" style={{borderLeft:'none'}}>No</th>
+                      <th scope="col" style={{borderLeft:'none', width:"30px"}}>No</th>
                       <th scope="col" style={{borderRight: 'none'}}>Nama File</th>
                     </tr>
                   </thead>
                   <tbody>
                     {fileNames.map((item, index) => (
                       <tr key={index}>
-                        <td style={{borderLeft:'none'}}>{index + 1}</td>
+                        <td style={{borderLeft:'none', width: "30px"}}>{index + 1}</td>
                         <td style={{borderRight: 'none'}}>
                           <a href="#" onClick={() => handleOpenModal(item.fileName, item.filePath)}>
                             {item.fileName}

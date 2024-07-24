@@ -1,7 +1,7 @@
 import React from 'react';
 // import './App.css';
 import TemplateDemo from './Components/drop-file-input/DropFileInput';
-import PdfViewer from './Components/Text Editor/PdfViewer';
+import PdfViewer from './Components/PdfViewer/PdfViewer';
 
 function App() {
   return (

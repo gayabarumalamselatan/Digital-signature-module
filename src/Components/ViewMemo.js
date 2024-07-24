@@ -254,7 +254,7 @@ const ViewMemo = () => {
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
-                <li className="breadcrumb-item"><a href="/user">Home</a></li>
+                <li className="breadcrumb-item"><a href="/">Home</a></li>
                 <li className="breadcrumb-item active">View Memo</li>
               </ol>
             </div>
@@ -265,7 +265,7 @@ const ViewMemo = () => {
         <div className="card">
           <div className="col-12">
             <div className="card-header" style={{ background: "transparent" }}>
-              <h3 className="card-title mt-2">View Memo</h3>
+              <h3 className="card-title mt-2">View</h3>
             </div>
             <div className="card-body">
               <div className="row mb-3">

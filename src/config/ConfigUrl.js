@@ -1,4 +1,5 @@
 export const MEMO_SERVICE_BASE = process.env.REACT_APP_API_INTERNAL_MEMO_BASE;
+export const AUTH_SERVICE_BASE = process.env.REACT_APP_API_AUTH_SERVICE_BASE;
 
     // Internal Memo Service
     export const MEMO_SERVICE_VIEW = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list`;
@@ -10,4 +11,5 @@ export const MEMO_SERVICE_BASE = process.env.REACT_APP_API_INTERNAL_MEMO_BASE;
     export const MEMO_SERVICE_FILE_UPLOAD = `${MEMO_SERVICE_BASE}/internal-memo-service/form/file-upload`; 
     export const MEMO_SERVICE_VIEW_BASED_ON_USER = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/get-userName`;
     export const MEMO_SERVICE_GET_USER_LISTS =  `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/AllUserName`;
-    export const MEMO_SERVICE_LOAD_PDF = `${MEMO_SERVICE_BASE}/internal-memo-service/doc/viewpdf`
+    export const MEMO_SERVICE_LOAD_PDF = `${MEMO_SERVICE_BASE}/internal-memo-service/doc/viewpdf`;
+    export const MEMO_SERVICE_USERNAME_LISTS = `${AUTH_SERVICE_BASE}/auth-service/core-user/list`;
