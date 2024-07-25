@@ -432,11 +432,20 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 File Names
               </label>
 
-              <div className="table-responsive " style={{border:'none', minWidth: ""}}>
+              <div className="table-responsive " 
+                style={{
+                  border:'none',
+                  minWidth: "", 
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  overflowX: "scroll"
+                }}
+              >
                 <table className="table table-bordered" style={{ 
                   borderRadius: "20px",  
                   overflow: "hidden",
-                  tableLayout: "auto"      
+                  tableLayout: "auto",     
+                  marginBottom: "0px" ,
                 }}>
                   <thead>
                     <tr>

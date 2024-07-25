@@ -62,7 +62,7 @@ const Signature = () => {
               Download  
             </Button> */}
             <div className="ms-auto text-end mt-auto">
-            <p className="text-end me-2 mb-0 text-danger">(Optional)</p>
+            {/* <p className="text-end me-2 mb-0 text-danger">(Optional)</p> */}
             </div>
           </div>
         </div>

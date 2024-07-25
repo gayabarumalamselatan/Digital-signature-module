@@ -10,10 +10,9 @@ import Swal from "sweetalert2";
 const { Dragger } = Upload;
 const MySwal = withReactContent(Swal);
 
-const DropFileInput = ({validateField, uploadedFiles, setUploadedFiles, fileError, setFileError, resetUploadFiles}) => {
+const DropFileInput = ({fileList, setFileList, validateField, uploadedFiles, setUploadedFiles, fileError, setFileError, resetUploadFiles}) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [fileList, setFileList] = useState([]);
   const [uploadedFileObjects, setUploadedFileObjects] = useState([]);
 
   useEffect(()=>{
@@ -25,7 +24,7 @@ const DropFileInput = ({validateField, uploadedFiles, setUploadedFiles, fileErro
 
   const handleUpload = () => {
     if(!validateField()){
-      MySwal.fire("Error!", "Please fill all required fields above.", "error");
+      MySwal.fire("Error! ", "Please fill all required fields above.", "error");
       return;
     }
 

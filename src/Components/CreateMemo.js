@@ -26,7 +26,7 @@ function CreateMemo() {
     tipeDokumen:"BAST",
     createDate: "",
     dueDate: "",
-    statusMemo: "",
+    statusMemo: "ON_PROGRESS",
     userMaker: "",
     userApproval1Note: "",  
     userApproval2Note: "",
@@ -34,20 +34,19 @@ function CreateMemo() {
     userApproval2Name: "",
     userId: gettingUserId,
   });
-
-
   const [options, setOptions] = useState([]);
   const [newOptions, setNewOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileError, setFileError] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [fileList, setFileList] = useState([]);
 
   const handleFileChange = (files) => {
     setSelectedFiles(files);
-    
   };
 
+  //Reset form function
   const handleCancel = (event) => {
     event.preventDefault();
     const currentDate = new Date().toISOString().split('T')[0];
@@ -61,7 +60,7 @@ function CreateMemo() {
       tipeDokumen: "BAST",
       createDate: "",
       dueDate: "",
-      statusMemo: "",
+      statusMemo: "ON_PROGRESS",
       userMaker: "",
       userApproval1Note: "",  
       userApproval2Note: "",
@@ -70,6 +69,9 @@ function CreateMemo() {
     });
     setSelectedFiles([]);
     setErrors({});
+    setFileError(false);
+    setUploadedFiles([]);
+    setFileList([]);
   };
 
   useEffect(() => {
@@ -109,6 +111,7 @@ function CreateMemo() {
     return Object.keys(newErrors).length === 0;
   };
 
+  //Fungsi require field
   const validateField = () => {
     const requiredFields = [
       "title", "tipeDokumen", "nomor", "requestor", "requestDate", "requestTitle", 
@@ -123,14 +126,17 @@ function CreateMemo() {
     return Object.keys(newErrors).length === 0;
   }
 
+  //Submit Function
   const handleSubmit = async (event) => {
     event.preventDefault();
     
+    //Memanggil Function require field
     if (!validateForm()) {
       MySwal.fire("Error!", "Please fill in all required fields.", "error");
       return;
     }
 
+    //Swal popup
     const result = await MySwal.fire({
       title: "Are you sure?",
       text: "Do you want to submit the form?",
@@ -289,6 +295,8 @@ function CreateMemo() {
                     fileError={fileError}
                     resetUploadedFiles={handleSubmit}
                     validateField={validateField}
+                    fileList={fileList}
+                    setFileList={setFileList}
                   />
                   {errors.file && <small className="text-danger">{errors.file}</small>}
                 </div>

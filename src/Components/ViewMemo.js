@@ -343,9 +343,11 @@ const ViewMemo = () => {
                       <th scope="col">Request Date</th>
                       <th scope="col">Request Title</th>
                       <th scope="col">Request Detail</th>
+                      <th scope="col">Tipe Dokumen</th>
                       <th scope="col">Create Date</th>
                       <th scope="col">Due Date</th>
                       <th scope="col">Status Memo</th>
+                      <th scope="col">User Maker</th>
                       <th scope="col">User Approval 1 Note</th>
                       <th scope="col">User Approval 2 Note</th>
                       <th scope="col">User Approval 1 Name</th>
@@ -363,9 +365,11 @@ const ViewMemo = () => {
                         <td>{item.requestDate}</td>
                         <td>{item.requestTitle}</td>
                         <td>{item.requestDetail}</td>
+                        <td>{item.tipeDokumen}</td>
                         <td>{item.createDate}</td>
                         <td>{item.dueDate}</td>
                         <td>{item.statusMemo}</td>
+                        <td>{item.userMaker}</td>
                         <td>{item.userApproval1Note}</td>
                         <td>{item.userApproval2Note}</td>
                         <td>{item.userApproval1Name}</td>
