@@ -9,7 +9,7 @@ import { getToken, getUserId, getUserName, token } from "../../config/Constant";
 import { MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
 
 const userId = getUserId();
-const userName = getUserName();
+// const userName = getUserName();
 
 const ModalShow = ({ show, handleClose, fileName, filePath }) => (
   <Modal size="xl" show={show} onHide={handleClose} scrollable={true}>
@@ -56,8 +56,27 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
     userApproval2Name: "",
   });
   const headers = { Authorization: `Bearer ${token}`};
+  const [userName, setUserName] = useState(getUserName());
 
   console.log("userId: ",userId);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const newUserName = getUserName();
+      if (newUserName !== userName) {
+        setUserName(newUserName);
+      }
+    }, 1000); 
+  
+    return () => clearInterval(intervalId);
+  }, [userName]);
+
+  const updateUserRoles = (userName) => {
+    setIsApproval1(userName === "digital_signature_approval1");
+    setIsApproval2(userName === "digital_signature_approval2");
+    setIsMaker(userName === "digital_signature_maker");
+    setIsAdmin(userName === "digital_signature_admin");
+  }
 
   useEffect(() => {
     if (memo) {
@@ -71,10 +90,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
         fetchFileNames(memo.nomor);
       }
     }
-    setIsApproval1(userName === "digital_signature_approval1");
-    setIsApproval2(userName === "digital_signature_approval2");
-    setIsMaker(userName === "digital_signature_maker");
-    setIsAdmin(userName === "digital_signature_admin");
+    updateUserRoles(userName);
     fetchUserNames();
   }, [memo, userName]);
 
