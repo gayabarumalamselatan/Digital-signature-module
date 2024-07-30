@@ -11,7 +11,6 @@ import { Button } from "react-bootstrap";
 
 const MySwal = withReactContent(Swal);
 const token = getToken();
-const gettingUserName = getUserName();
 const gettingUserId = getUserId();
 const headers = { Authorization: `Bearer ${token}`}
 
@@ -41,6 +40,7 @@ function CreateMemo() {
   const [fileError, setFileError] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [fileList, setFileList] = useState([]);
+  const [gettingUserName, setGettingUserName] = useState(getUserName());
 
   const handleFileChange = (files) => {
     setSelectedFiles(files);
@@ -73,6 +73,16 @@ function CreateMemo() {
     setUploadedFiles([]);
     setFileList([]);
   };
+
+  useEffect(()=>{
+    const intervalId = setInterval(() => {
+      const newUserName = getUserName();
+      if (newUserName !== gettingUserName){
+        setGettingUserName(newUserName);
+      }
+    }, 1000);
+    return () => clearInterval(intervalId);
+  },[gettingUserName]);
 
   useEffect(() => {
     const params = 'username&status&page=0&size=500';
@@ -148,6 +158,15 @@ function CreateMemo() {
   
     if (result.isConfirmed) {
       try {
+        MySwal.fire({
+          title: "Loading...",
+          text: "Please wait while we process your request.",
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         const formDataToSend = new FormData();
         for (const key in formData) {
           if (formData[key]) formDataToSend.append(key, formData[key]);

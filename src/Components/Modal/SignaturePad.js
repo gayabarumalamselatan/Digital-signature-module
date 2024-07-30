@@ -1,17 +1,39 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { saveAs } from "file-saver";
 import { Button } from "react-bootstrap";
 
-const Signature = () => {
+const Signature = ({getSignature, signatureBlob}) => {
   const sigCanvas = useRef({});
+
+  // useEffect(() => {
+  //   if (signatureBlob) {
+  //     sigCanvas.current.fromDataURL(signatureBlob);
+  //   }
+  // }, [signatureBlob]);
+
+useEffect( () => {
+  handleSave();
+},[]);  
+  
+
+
+  // const handleSave = (format) => {
+  //   const dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL(`image/${format}`);
+  //   const blob = dataURLToBlob(dataURL);
+  //   saveAs(blob, `signature.${format}`);
+  // };
+
 
   const clear = () => sigCanvas.current.clear();
 
-  const handleSave = (format) => {
-    const dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL(`image/${format}`);
+  const handleSave = () => {
+    const dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png");
+    //const base64Signature = dataURLToBlob(dataURL);
     const blob = dataURLToBlob(dataURL);
-    saveAs(blob, `signature.${format}`);
+    //const base64Signature = btoa(String.fromCharCode(...new Uint8Array(blob)));
+    const base64Signature = dataURL.split(",")[1];
+    getSignature(base64Signature);
   };
 
   const dataURLToBlob = (dataURL) => {
@@ -20,8 +42,9 @@ const Signature = () => {
     for (let i = 0; i < binary.length; i++) {
       array.push(binary.charCodeAt(i));
     }
-    return new Blob([new Uint8Array(array)], { type: `image/png` });
+    return new Blob([new Uint8Array(array)], { type: "image/png" });
   };
+
 
   const boxShadowStyle = {
     maxWidth:"500px",
@@ -58,7 +81,7 @@ const Signature = () => {
               }} >
               Clear
             </Button>
-            {/* <Button className="btn btn-primary ms-2" onClick={() => handleSave("png")}>
+            {/* <Button className="btn btn-primary ms-2" onClick={handleSave}>
               Download  
             </Button> */}
             <div className="ms-auto text-end mt-auto">

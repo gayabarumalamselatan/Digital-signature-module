@@ -6,7 +6,7 @@ import PdfViewer from "../PdfViewer/PdfViewer";
 import Signature from "./SignaturePad";
 import Swal from "sweetalert2";
 import { getToken, getUserId, getUserName, token } from "../../config/Constant";
-import { MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
+import { MEMO_SERVICE_CREATE, MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
 
 const userId = getUserId();
 // const userName = getUserName();
@@ -27,7 +27,7 @@ const ModalShow = ({ show, handleClose, fileName, filePath }) => (
   </Modal>
 );
 
-function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
+function ModalEdit({ show, handleClose, memo, fetchData,  }) {
   const [showSignature, setShowSignature] = useState(false)
   const [showModal, setShowModal] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
@@ -57,8 +57,11 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
   });
   const headers = { Authorization: `Bearer ${token}`};
   const [userName, setUserName] = useState(getUserName());
+  const [signature, setSignature] = useState(null);
 
-  console.log("userId: ",userId);
+  const getSignature = (base64Signature) => {
+    setSignature(base64Signature);
+  };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -123,10 +126,9 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => {
+      return { ...prevData, [name]: value };
+    });
   };
 
   const formatDate = (dateString) => {
@@ -152,6 +154,15 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          Swal.fire({
+            title: "Loading...",
+            text: "Please wait while we process your request.",
+            showConfirmButton: false,
+            willOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
           const token = getToken();
           const config = {
             headers: {
@@ -160,18 +171,27 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
             },
           };
 
+          const updatedFormData = {
+            ...formData,
+            digisignCheck: showSignature,
+            digisignKey: document.getElementById("digisignKey").value,
+            base64Signature: `data:image/png;base64,${signature}`,
+          };
+
+
           const data = new FormData();
-          Object.keys(formData).forEach((key) => {
-            data.append(key, formData[key]);
+          Object.keys(updatedFormData).forEach((key) => {
+            if (updatedFormData[key] === null) {
+              data.append(key, "");
+            } else {
+              data.append(key, updatedFormData[key]);
+            }
           });
 
           data.set("userId", userId);
 
           if (file) {
             data.append("file", file);
-          }
-          if (signatureBlob) {
-            data.append("signature", signatureBlob);
           }
 
           const response = await axios.put(`${MEMO_SERVICE_UPDATE}`, data, config);
@@ -204,7 +224,10 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
     setShowModal(true);
   };
 
-  const handleCloseModal = () => setShowModal(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   const handleSignatureCheckboxChange = () => {
     setShowSignature(!showSignature);
   };
@@ -491,6 +514,7 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
                 className="form-check-input" 
                 checked={showSignature} 
                 onChange={handleSignatureCheckboxChange} 
+                disabled = {!isApproval1 && !isApproval2}
                 />
                 <label className="form-check-label text-danger">
                   Check to include signature (optional).
@@ -498,7 +522,27 @@ function ModalEdit({ show, handleClose, memo, fetchData, signatureBlob }) {
               </div>
               {showSignature && (
                 <div className="mt-2">
-                  <Signature />
+                  <div className=" mb-2">
+                  <label htmlFor="digisignKey" className="form-label">
+                    Signature Key
+                  </label>
+                  <input
+                     type="number"
+                     onKeyPress={(e) => {
+                       if (!/[0-9]/.test(e.key)) {
+                         e.preventDefault();
+                       }
+                     }}
+                     className="form-control"
+                     id="digisignKey"
+                     name="digisignKey"
+                     onChange={handleChange}
+                    style={{background: "transparent", borderColor: "#646464", borderRadius: "15px", color: "#646464"}}
+                  />
+                </div>
+                  <Signature 
+                    getSignature={getSignature}
+                  />
                 </div>
               )}
             </div>
