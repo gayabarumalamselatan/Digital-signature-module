@@ -242,7 +242,6 @@ const MemoReport = () => {
                     <thead>
                       <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Id</th>
                         <th scope="col">Title</th>
                         <th scope="col">Nomor</th>
                         <th scope="col">Requestor</th>
@@ -262,7 +261,6 @@ const MemoReport = () => {
                       {filteredData.map((item, index) => (
                         <tr key={index}>
                           <td scope="row">{index + 1}</td>
-                          <td>{item.id}</td>
                           <td>{item.title}</td>
                           <td>{item.nomor}</td>
                           <td>{item.requestor}</td>

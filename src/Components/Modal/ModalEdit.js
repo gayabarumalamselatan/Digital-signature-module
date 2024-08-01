@@ -50,8 +50,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     createDate: "",
     dueDate: "",
     statusMemo: "",
-    userApproval1Note: "",
-    userApproval2Note: "",
+    userApproval1Note: null,
+    userApproval2Note: null,
     userApproval1Name: "",
     userApproval2Name: "",
   });
@@ -88,6 +88,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
         requestDate: formatDate(memo.requestDate),
         createDate: formatDate(memo.createDate),
         dueDate: formatDate(memo.dueDate),
+        userApproval1Note: memo.userApproval1Note || null,
+        userApproval2Note: memo.userApproval2Note || null,
       });
       if (memo && memo.nomor) {
         fetchFileNames(memo.nomor);
@@ -143,6 +145,25 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (showSignature && !document.getElementById("digisignKey")?.value) {
+      Swal.fire({
+        title: "Error!",
+        text: "Signature key is required.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      const smallElement = document.querySelector("#digisignKey + small");
+        if (smallElement) {
+          smallElement.style.display = "block";
+        }
+      return;
+    } else {
+      const smallElement = document.querySelector("#digisignKey + small");
+      if (smallElement) {
+        smallElement.style.display = "none";
+      }
+    }
+
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to save the changes?",
@@ -171,13 +192,26 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
             },
           };
 
-          const updatedFormData = {
-            ...formData,
-            digisignCheck: showSignature,
-            digisignKey: document.getElementById("digisignKey").value,
-            base64Signature: `data:image/png;base64,${signature}`,
-          };
+          let updatedFormData = {...formData};
+          const base64Value = `data:image/png;base64,${signature}`;
 
+          if (formData.statusMemo !== "REJECTED" || formData.statusMemo !== "REWORK" || formData.statusMemo !== 'PENDING') {
+            updatedFormData = {
+             ...updatedFormData,
+              digisignCheck: showSignature,
+              digisignKey: document.getElementById("digisignKey")?.value || "",
+              base64Signature: signature !== null ? base64Value : "",
+            };
+          } else {
+             updatedFormData = {...formData };
+          }
+
+          // const updatedFormData = {
+          //   ...formData,
+          //   digisignCheck: showSignature,
+          //   digisignKey: document.getElementById("digisignKey").value,
+          //   base64Signature: `data:image/png;base64,${signature}`,
+          // };
 
           const data = new FormData();
           Object.keys(updatedFormData).forEach((key) => {
@@ -507,38 +541,45 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 </table>
               </div>
             </div>
-            <div className="col-md-6 ">
-              <div className="ms-4 mt-4">
-                <input 
-                type="checkbox" 
-                className="form-check-input" 
-                checked={showSignature} 
-                onChange={handleSignatureCheckboxChange} 
-                disabled = {!isApproval1 && !isApproval2}
-                />
-                <label className="form-check-label text-danger">
-                  Check to include signature (optional).
-                </label>
-              </div>
-              {showSignature && (
+
+            {formData.statusMemo === 'APPROVE_BY_APPROVAL1' || formData.statusMemo === 'APPROVE_BY_APPROVAL2' ? (
+              <>
+                <div className="col-md-6 ">
+                  <div className="ms-4 mt-4">
+                    <input 
+                    type="checkbox" 
+                    className="form-check-input" 
+                    checked={showSignature} 
+                    onChange={handleSignatureCheckboxChange} 
+                    disabled = {!isApproval1 && !isApproval2}
+                    />
+                    <label className="form-check-label text-danger">
+                      Check to include signature (optional).
+                    </label>
+                  </div>
+                {showSignature && (
                 <div className="mt-2">
                   <div className=" mb-2">
                   <label htmlFor="digisignKey" className="form-label">
                     Signature Key
                   </label>
                   <input
-                     type="number"
-                     onKeyPress={(e) => {
-                       if (!/[0-9]/.test(e.key)) {
-                         e.preventDefault();
-                       }
-                     }}
-                     className="form-control"
-                     id="digisignKey"
-                     name="digisignKey"
-                     onChange={handleChange}
+                    type="number"
+                    onKeyPress={(e) => {
+                      if (!/[0-9]/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    className="form-control"
+                    id="digisignKey"
+                    name="digisignKey"
+                    onChange={handleChange}
                     style={{background: "transparent", borderColor: "#646464", borderRadius: "15px", color: "#646464"}}
+                    required
                   />
+                  <small id="digisignKeyError" className="text-danger" style={{ display: "none" }}>
+                    Signature key is required.
+                  </small>          
                 </div>
                   <Signature 
                     getSignature={getSignature}
@@ -546,6 +587,12 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 </div>
               )}
             </div>
+              </> 
+              ) : (
+              <>
+
+              </>
+            )}
 
           </form>
         </Modal.Body>

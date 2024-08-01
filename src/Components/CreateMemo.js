@@ -99,8 +99,19 @@ function CreateMemo() {
     setFormData((prevData) => ({
       ...prevData,
       requestDate: currentDate,
+      createDate: currentDate,
     }));
-  }, []);
+
+    if (formData.requestDate) {
+      const dueDate = new Date(formData.requestDate);
+      dueDate.setDate(dueDate.getDate() + 3);
+      setFormData((prevData) => ({
+        ...prevData,
+        dueDate: dueDate.toISOString().split("T")[0],
+      }));
+    }
+
+  }, [formData.requestDate]);
 
   const validateForm = () => {
     const requiredFields = [
@@ -297,7 +308,7 @@ function CreateMemo() {
               {renderTextAreaField("Request Detail", "requestDetail")}
               {renderInputField("Create Date", "createDate", "date")}
               {renderInputField("Due Date", "dueDate", "date")}
-              {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])}
+              {/* {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])} */}
               {renderSelectField("User Maker", "userMaker", options)}
               {renderTextAreaField("User Approval 1 Note", "userApproval1Note", true)}
               {renderTextAreaField("User Approval 2 Note", "userApproval2Note", true)}

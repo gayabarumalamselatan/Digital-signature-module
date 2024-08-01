@@ -8,6 +8,7 @@ import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { MEMO_SERVICE_DELETE, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
+import { text } from "@fortawesome/fontawesome-svg-core";
 
 
 const ViewMemo = () => {
@@ -40,6 +41,11 @@ const ViewMemo = () => {
     fetchData();
   }, [currentPage, pageSize]);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
 
   // Classic get method, show all data
   // const fetchData = async ()=> {
@@ -50,7 +56,6 @@ const ViewMemo = () => {
   //     console.error('error', error);
   //   }
   // }
-
 
   //Descending order (Id dari data terbaru)
   const fetchData = async () => {
@@ -83,7 +88,7 @@ const ViewMemo = () => {
   
   //     if (searchFilter !== "" && searchFilterValue !== "") {
   //       urlParams = `size=${pageSize}&page=${currentPage}&${searchFilter}=${searchFilterValue}`;
-  //     } else {
+  //     } else { 
   //       urlParams = `size=${pageSize}&page=${currentPage}`;
   //     }
   
@@ -100,6 +105,22 @@ const ViewMemo = () => {
   //   }
   // };
   
+  const getStatusMemoColor = (statusMemo) => {
+    switch (statusMemo) {
+      case "REJECTED":
+        return "#dc3545";
+      case "PENDING":
+      case "ON_PROGRESS":
+      case "REWORK":
+      case "APPROVE_BY_APPROVAL1":
+      case "APPROVE_BY_APPROVAL2":
+        return "#ffc107";
+      case "DONE":
+        return "#198754";
+      default:
+        return "";
+    }
+  };
 
   const deleteData = async (id) => {
     try {
@@ -112,10 +133,11 @@ const ViewMemo = () => {
     }
   };
 
-  const removeData = async (id) => {
+  const removeData = async (item) => {
+    // const {nomor} = item;
     const result = await MySwal.fire({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: `${item.nomor} will be deleted.`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
@@ -124,10 +146,10 @@ const ViewMemo = () => {
 
     if (result.isConfirmed) {
       try {
-        console.log(id);
-        await deleteData(id);
+        console.log(item);
+        await deleteData(item.id);
         fetchData();
-        MySwal.fire("Deleted!", "Your item has been deleted.", "success");
+        MySwal.fire("Deleted!", `${item.nomor} has been deleted.`, "success");
       } catch (error) {
         console.error(error);
         MySwal.fire("Error!", "There was an error deleting the item.", "error");
@@ -362,13 +384,13 @@ const ViewMemo = () => {
                         <td>{item.title}</td>
                         <td>{item.nomor}</td>
                         <td>{item.requestor}</td>
-                        <td>{item.requestDate}</td>
-                        <td>{item.requestTitle}</td>
-                        <td>{item.requestDetail}</td>
+                        <td>{formatDate(item.requestDate)}</td>
+                        <td>{formatDate(item.createDate)}</td>
+                        <td>{formatDate(item.dueDate)}</td>
                         <td>{item.tipeDokumen}</td>
                         <td>{item.createDate}</td>
                         <td>{item.dueDate}</td>
-                        <td>{item.statusMemo}</td>
+                        <td style={{ color: getStatusMemoColor(item.statusMemo) }}>{item.statusMemo}</td>
                         <td>{item.userMaker}</td>
                         <td>{item.userApproval1Note}</td>
                         <td>{item.userApproval2Note}</td>
@@ -379,7 +401,7 @@ const ViewMemo = () => {
                             <button className="btn btn-outline-primary mx-2" onClick={() => handleEditClick(item)}>
                               <FontAwesomeIcon icon={faEdit}/>
                             </button>
-                            <button className="btn btn-outline-danger me-2" onClick={() => removeData(item.id)}>
+                            <button className="btn btn-outline-danger me-2" onClick={() => removeData(item)}>
                               <FontAwesomeIcon icon={faTrash}/>
                             </button> 
                           </div>

@@ -16,8 +16,6 @@ useEffect( () => {
   handleSave();
 },[]);  
   
-
-
   // const handleSave = (format) => {
   //   const dataURL = sigCanvas.current.getTrimmedCanvas().toDataURL(`image/${format}`);
   //   const blob = dataURLToBlob(dataURL);
