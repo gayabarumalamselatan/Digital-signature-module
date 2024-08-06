@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { MEMO_SERVICE_DELETE, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
 import { text } from "@fortawesome/fontawesome-svg-core";
 
@@ -24,13 +24,13 @@ const ViewMemo = () => {
 
   // Buat get token & userid
   const token = getToken();
-  const userName = getUserName();
-  const userId = getUserId();
+  const [userName, setUserName] = useState(getUserName());
+  //const userId = getUserId();
   
 
   // Buat ngambil token buat postman
   // Apus klo app udah jadi
-  const ngegettoken = sessionStorage.getItem('accessToken');
+  //const ngegettoken = sessionStorage.getItem('accessToken');
   // console.log('token', ngegettoken);
   // console.log('userId', userId);
   // console.log('UserName',userName);
@@ -38,8 +38,18 @@ const ViewMemo = () => {
   const headers = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
+    const intervalId = setInterval(()=>{
+      const newUserName = getUserName();
+      if(newUserName !== userName){
+        setUserName(newUserName);
+      }
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(()=>{
     fetchData();
-  }, [currentPage, pageSize]);
+  },[currentPage, pageSize]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -266,6 +276,8 @@ const ViewMemo = () => {
     return paginationItems;
   };
 
+  const allowedButtons = ['digital_signature_admin'];
+
   return (
     <>
       <section className="content-header">
@@ -385,11 +397,11 @@ const ViewMemo = () => {
                         <td>{item.nomor}</td>
                         <td>{item.requestor}</td>
                         <td>{formatDate(item.requestDate)}</td>
+                        <td>{item.requestTitle}</td>
+                        <td>{item.requestDetail}</td>
+                        <td>{item.tipeDokumen}</td>
                         <td>{formatDate(item.createDate)}</td>
                         <td>{formatDate(item.dueDate)}</td>
-                        <td>{item.tipeDokumen}</td>
-                        <td>{item.createDate}</td>
-                        <td>{item.dueDate}</td>
                         <td style={{ color: getStatusMemoColor(item.statusMemo) }}>{item.statusMemo}</td>
                         <td>{item.userMaker}</td>
                         <td>{item.userApproval1Note}</td>
@@ -401,9 +413,28 @@ const ViewMemo = () => {
                             <button className="btn btn-outline-primary mx-2" onClick={() => handleEditClick(item)}>
                               <FontAwesomeIcon icon={faEdit}/>
                             </button>
-                            <button className="btn btn-outline-danger me-2" onClick={() => removeData(item)}>
-                              <FontAwesomeIcon icon={faTrash}/>
-                            </button> 
+                            {allowedButtons.includes(userName)? 
+                              (
+                                <>
+                                  <button className="btn btn-outline-danger me-2" onClick={() => removeData(item)}>
+                                    <FontAwesomeIcon icon={faTrash}/>
+                                  </button> 
+                                </> 
+                              ) : (
+                                <></>
+                              )
+                            }
+                            {item.statusMemo === 'DONE' ? 
+                            (
+                              <>
+                                <button className="btn btn-outline-success me-2" style={{backgroundColor: "#198754", borderColor: "#198754"}}>
+                                  <FontAwesomeIcon icon={faDownload}/>
+                                </button> 
+                              </>
+                            ):(
+                              <></>
+                            )
+                            }
                           </div>
                         </td>
                       </tr>

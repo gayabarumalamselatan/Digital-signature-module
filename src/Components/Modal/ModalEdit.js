@@ -50,8 +50,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     createDate: "",
     dueDate: "",
     statusMemo: "",
-    userApproval1Note: null,
-    userApproval2Note: null,
+    userApproval1Note: "",
+    userApproval2Note: "",
     userApproval1Name: "",
     userApproval2Name: "",
   });
@@ -88,8 +88,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
         requestDate: formatDate(memo.requestDate),
         createDate: formatDate(memo.createDate),
         dueDate: formatDate(memo.dueDate),
-        userApproval1Note: memo.userApproval1Note || null,
-        userApproval2Note: memo.userApproval2Note || null,
+        userApproval1Note: memo.userApproval1Note ,
+        userApproval2Note: memo.userApproval2Note ,
       });
       if (memo && memo.nomor) {
         fetchFileNames(memo.nomor);
@@ -300,7 +300,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -315,7 +315,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="nomor"
                 value={formData.nomor}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -330,7 +330,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestor"
                 value={formData.requestor}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -345,7 +345,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestDate"
                 value={formData.requestDate}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -360,7 +360,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestTitle"
                 value={formData.requestTitle}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -375,7 +375,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="createDate"
                 value={formData.createDate}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -390,7 +390,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -404,7 +404,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="userApproval1Name"
                 value={formData.userApproval1Name}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin }
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               >
                 <option value="">Select an option</option>
                 {userNames.map((user, index) => (
@@ -425,7 +425,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="userApproval2Name"
                 value={formData.userApproval2Name}
                 onChange={handleChange}
-                disabled={!isMaker && !isAdmin }
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               >
                 <option value="">Select an option</option>
                 {userNames.map((user, index) => (
@@ -446,7 +446,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="statusMemo"
                 value={formData.statusMemo}
                 onChange={handleChange}
-                disabled = {!isAdmin &&!isApproval1 && !isApproval2}
+                disabled = {(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isAdmin &&!isApproval1 && !isApproval2}
               >
                 <option value="">Select an option</option>
                 <option value="ON_PROGRESS">ON_PROGRESS</option>
@@ -468,7 +468,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestDetail"
                 value={formData.requestDetail}
                 onChange={handleChange}
-                disabled = {!isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -589,11 +589,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
             </div>
               </> 
               ) : (
-              <>
-
-              </>
+              <></>
             )}
-
           </form>
         </Modal.Body>
         <Modal.Footer>

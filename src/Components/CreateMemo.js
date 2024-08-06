@@ -50,6 +50,9 @@ function CreateMemo() {
   const handleCancel = (event) => {
     event.preventDefault();
     const currentDate = new Date().toISOString().split('T')[0];
+    const dueDate = new Date(formData.requestDate);
+    dueDate.setDate(dueDate.getDate() + 3);
+    const newDueDate = dueDate.toISOString().split('T')[0];
     setFormData({
       title: "Internal Memo",
       nomor: "",
@@ -58,8 +61,8 @@ function CreateMemo() {
       requestTitle: "",
       requestDetail: "",
       tipeDokumen: "BAST",
-      createDate: "",
-      dueDate: "",
+      createDate: currentDate,
+      dueDate: newDueDate,
       statusMemo: "ON_PROGRESS",
       userMaker: "",
       userApproval1Note: "",  

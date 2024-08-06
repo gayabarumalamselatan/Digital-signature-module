@@ -150,7 +150,12 @@ const DropFileInput = ({fileList, setFileList, validateField, uploadedFiles, set
         </Dragger>
       </div>
       {fileError && <Alert message="Warning" description="Upload a document first before submitting." type="warning" showIcon style={{ marginTop: 20 }} />}
-      <Button type="primary" onClick={handleUpload} disabled={uploading} loading={uploading} style={{ marginTop: 30 }}>
+      <Button 
+        type="primary" 
+        onClick={handleUpload} 
+        disabled={uploading || fileList.length === 0} 
+        loading={uploading} 
+        style={{ marginTop: 30 }}>
         {uploading ? "Uploading" : "Upload"}
       </Button>
       {/* {uploadedFiles.length > 0 && (
