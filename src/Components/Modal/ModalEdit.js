@@ -11,21 +11,6 @@ import { MEMO_SERVICE_CREATE, MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LIST
 const userId = getUserId();
 // const userName = getUserName();
 
-const ModalShow = ({ show, handleClose, fileName, filePath }) => (
-  <Modal size="xl" show={show} onHide={handleClose} scrollable={true}>
-    <Modal.Header closeButton>
-      <Modal.Title>File Details</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <PdfViewer fileName={fileName} filePath={filePath}/>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button variant="secondary" onClick={handleClose}>
-        Close
-      </Button>
-    </Modal.Footer>
-  </Modal>
-);
 
 function ModalEdit({ show, handleClose, memo, fetchData,  }) {
   const [showSignature, setShowSignature] = useState(false)
@@ -62,6 +47,23 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
   const getSignature = (base64Signature) => {
     setSignature(base64Signature);
   };
+
+  const ModalShow = ({ show, handleClose, fileName, filePath }) => (
+    <Modal size="xl" show={show} onHide={handleClose} scrollable={true}>
+      <Modal.Header closeButton>
+        <Modal.Title>File Details</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <PdfViewer fileName={fileName} filePath={filePath}/>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+  
 
   useEffect(() => {
     const intervalId = setInterval(() => {
