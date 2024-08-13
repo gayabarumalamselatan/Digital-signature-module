@@ -172,7 +172,7 @@ const MemoReport = () => {
                 <option value="APPROVE_BY_APPROVAL2">APPROVE_BY_APPROVAL2</option>
                 {/* ... (other options) */}
               </select>
-              <div className="mb-3 py-5 text-end">
+              <div className="mb-3 pt-5 text-end">
                 <Button label="Search" className="btn btn-primary text-end" onClick={handleSearch} />
               </div>
             </div>
@@ -238,7 +238,7 @@ const MemoReport = () => {
             <div className="card-body">
               <div className="mx-2">
                 <div className="table-responsive table-bordered">
-                  <table className="table table-bordered rounded-3 table-striped border-bottom">
+                  <table className="table table-bordered table-striped border-bottom">
                     <thead>
                       <tr>
                         <th scope="col">#</th>

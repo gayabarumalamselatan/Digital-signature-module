@@ -4,6 +4,17 @@ import Swal from 'sweetalert2';
 
 const VerifyMemo = () => {
     
+  // const requiredForm = () => {
+  //   const requiredField = [
+  //     'nomorSurat', 'fileSurat'
+  //   ];
+
+  //   const newErrors = {};
+
+  //   requiredField.forEach(field => {
+  //     if (!formData[field]) newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required!`;
+  //   });
+  // };
   
   return (
     <>
@@ -24,7 +35,7 @@ const VerifyMemo = () => {
       </section>
 
       <section className='content'>
-        <div className='card mx-3 px-4 py-5'>
+        <div className='card mx-3 px-4 pt-4'>
           <form className='form-group'>
             <div className='row mb-2'>
               <label className='col-2 col-form-label'>
@@ -33,7 +44,9 @@ const VerifyMemo = () => {
               <div className='col-10'>
                 <input 
                 type="text" 
+                name='nomorSurat'
                 className="form-control"
+                required
               />
               </div>
             </div>
@@ -49,7 +62,9 @@ const VerifyMemo = () => {
                     accept='application/pdf' 
                     className="form-control" 
                     aria-label="Upload"
+                    name='fileSurat'
                     style={{border: "1px solid #00052E", borderRadius: "10px"}}
+                    required
                   />
                 </div>
               </div>

@@ -90,6 +90,21 @@ const ViewMemo = () => {
     }
   };
 
+  // Download done memo
+  const downloadDoneMemo = async () => {
+    Swal.fire({
+      title: "Ups",
+      text:  "This service in unavailable",
+      icon: "warning",
+      confirmButtonText: "Back",
+    });
+    try{
+      // const response = await axios.get(`/api/download`, {headers});
+    }catch(error){
+      console.error('error', error);
+    }
+  };
+
 
   // Urutan Ascending (Id dari 1)
   // const fetchData = async () => {
@@ -367,7 +382,7 @@ const ViewMemo = () => {
               </div>
               <div className="table-responsive">
                 <table className="table table-bordered rounded-3 table-striped border-bottom" >
-                  <thead>
+                  <thead style={{position: "sticky"}}>
                     <tr>
                       {/* Kolom id apus klo app udah jadi */}
                       <th scope="col">#</th>
@@ -427,7 +442,7 @@ const ViewMemo = () => {
                             {item.statusMemo === 'DONE' ? 
                             (
                               <>
-                                <button className="btn btn-outline-success me-2" style={{backgroundColor: "#198754", borderColor: "#198754"}}>
+                                <button className="btn btn-outline-success me-2" onClick={downloadDoneMemo} style={{backgroundColor: "#198754", borderColor: "#198754"}}>
                                   <FontAwesomeIcon icon={faDownload}/>
                                 </button> 
                               </>
