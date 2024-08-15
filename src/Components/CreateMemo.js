@@ -150,6 +150,17 @@ function CreateMemo() {
     return Object.keys(newErrors).length === 0;
   }
 
+  // const formattedDateTime = (date) => {
+  //   const year = date.getFullYear();
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const hour = String(date.getHours()).padStart(2, '0');
+  //   const minute = String(date.getMinutes()).padStart(2, '0');
+  //   const second = String(date.getSeconds()).padStart(2, '0');
+  //   const millisecond = String(date.getMilliseconds()).padStart(3, '0');
+  //   return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
+  // };
+
   //Submit Function
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -159,6 +170,14 @@ function CreateMemo() {
       MySwal.fire("Error!", "Please fill in all required fields.", "error");
       return;
     }
+
+    // const currentDate = new Date();
+    // const dueDate = new Date(formData.dueDate);
+    // dueDate.setHours(currentDate.getHours());
+    // dueDate.setMinutes(currentDate.getMinutes());
+    // dueDate.setSeconds(currentDate.getSeconds());
+    // dueDate.setMilliseconds(currentDate.getMilliseconds());
+    // const formattedDueDate = formattedDateTime(dueDate);
 
     //Swal popup
     const result = await MySwal.fire({
@@ -185,6 +204,8 @@ function CreateMemo() {
         for (const key in formData) {
           if (formData[key]) formDataToSend.append(key, formData[key]);
         }
+
+        //formDataToSend.set('dueDate', formattedDueDate);
     
         const response = await axios.post(
           `${MEMO_SERVICE_CREATE}`, 

@@ -3,8 +3,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "primereact/button";
 import React, { useEffect, useState } from "react";
 import { getToken } from "../config/Constant";
-import { MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
+import { MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_PAGINAT, MEMO_SERVICE_REPORT } from "../config/ConfigUrl";
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 import { FaDownload, FaSyncAlt} from "react-icons/fa"
 
 const MemoReport = () => {
@@ -18,6 +19,8 @@ const MemoReport = () => {
   const [inputError, setInputError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
+  const [error, setError] = useState({});
+  
 
   useEffect(() => {
     if (isSubmitted) {
@@ -25,37 +28,66 @@ const MemoReport = () => {
     }
   }, [isSubmitted]);
 
+  const getStatusMemoColor = (statusMemo) => {
+    switch (statusMemo) {
+      case "REJECTED":
+        return "#dc3545";
+      case "PENDING":
+      case "ON_PROGRESS":
+      case "REWORK":
+      case "APPROVE_BY_APPROVAL1":
+      case "APPROVE_BY_APPROVAL2":
+        return "#ffc107";
+      case "DONE":
+        return "#198754";
+      default:
+        return "";
+    }
+  };
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const token = getToken();
-      const response = await axios.get(`${MEMO_SERVICE_VIEW}`, {
+      const response = await axios.get(`${MEMO_SERVICE_REPORT}?dueDate=${formatedDate(formData.dueDate)}&statusMemo=${formData.statusMemo}`, {
         headers: {
           Authorization:` Bearer ${token}`,
         },
-        // params: {
-        //   due_date: formData.dueDate,
-        //   status_memo: formData.statusMemo,
-        // },
+
       });
       const sortedData = response.data.sort((a, b) => b.id - a.id);
       setFilteredData(sortedData);
-      setSearchError(""); // Reset search error message if successful
+      setSearchError("");
     } catch (error) {
       console.error("Error fetching data: ", error);
-      setSearchError("Error fetching data. Please try again."); // Set error message if fetch fails
+      setSearchError("Error fetching data. Please try again."); 
     } finally {
       setIsLoading(false);
     }
   };
 
+  const validateField = () => {
+    const  requiredFields =["dueDate", "statusMemo"];
+
+    const newErrors = {};
+
+    requiredFields.forEach(field => {
+      if (!formData[field]) newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required!`;
+    });
+
+    setError(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSearch = (event) => {
     event.preventDefault();
-    if (formData.dueDate === "" || formData.statusMemo === "") {
-      setInputError("Please fill in both fields.");
+    if (!validateField()) {
+      Swal.fire("Error!", "Please fill in all required fields.", "error");
+      return;
     } else {
       setInputError("");
       setIsSubmitted(true);
+      fetchData();
     }
   };
 
@@ -71,12 +103,25 @@ const MemoReport = () => {
     }));
   };
 
+  const formatedDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    const second = String(date.getSeconds()).padStart(2, '0');
+    const millisecond = String(date.getMilliseconds()).padStart(3, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
+    //const month = date.toLocaleString('en-US', { month: 'short' });
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
   };
 
   const getCurrentDateTime = () => {
@@ -156,6 +201,7 @@ const MemoReport = () => {
                 Due Date
               </label>
               <input type="date" className="form-control" id="dueDate" name="dueDate" value={formData.dueDate} onChange={handleChange} />
+              {error["dueDate"] && <small className="text-danger">{error["dueDate"]}</small>}
             </div>
 
             <div className="col-6">
@@ -164,20 +210,23 @@ const MemoReport = () => {
               </label>
               <select className="form-select" id="statusMemo" name="statusMemo" value={formData.statusMemo} onChange={handleChange}>
                 <option value="">Select an option</option>
+                <option value="ALL">ALL</option>
                 <option value="ON_PROGRESS">ON_PROGRESS</option>
                 <option value="PENDING">PENDING</option>
                 <option value="REJECTED">REJECTED</option>
                 <option value="REWORK">REWORK</option>
                 <option value="APPROVE_BY_APPROVAL1">APPROVE_BY_APPROVAL1</option>
                 <option value="APPROVE_BY_APPROVAL2">APPROVE_BY_APPROVAL2</option>
+                <option value="DONE">DONE</option>
                 {/* ... (other options) */}
               </select>
+              {error["statusMemo"] && <small className="text-danger">{error["statusMemo"]}</small>}
               <div className="mb-3 pt-5 text-end">
                 <Button label="Search" className="btn btn-primary text-end" onClick={handleSearch} />
               </div>
             </div>
           </div>
-          {inputError && (
+          {/* {inputError && (
             <div className="container mt-4 row justify-content-between gap-5">
               <div className="col-md-5">
                 <div className="alert alert-danger" role="alert">
@@ -185,11 +234,11 @@ const MemoReport = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {isLoading && (
-          <div className="card py-5 mt-5">
+          <div className="card py-5 mt-5 mx-3">
             <div className="ms-5 me-5">
               <p>Loading...</p>
             </div>
@@ -197,7 +246,7 @@ const MemoReport = () => {
         )}
 
         {searchError && (
-          <div className="card py-5 mt-5">
+          <div className="card py-5 mt-5 mx-3">
             <div className="ms-5 me-5">
               <p>{searchError}</p>
             </div>
@@ -264,12 +313,12 @@ const MemoReport = () => {
                           <td>{item.title}</td>
                           <td>{item.nomor}</td>
                           <td>{item.requestor}</td>
-                          <td>{item.requestDate}</td>
+                          <td>{formatedDate(item.requestDate)}</td>
                           <td>{item.requestTitle}</td>
                           <td>{item.requestDetail}</td>
-                          <td>{item.createDate}</td>
-                          <td>{item.dueDate}</td>
-                          <td>{item.statusMemo}</td>
+                          <td>{formatedDate(item.createDate)}</td>
+                          <td>{formatedDate(item.dueDate)}</td>
+                          <td style={{ color: getStatusMemoColor(item.statusMemo) }}>{item.statusMemo}</td>
                           <td>{item.userApproval1Note}</td>
                           <td>{item.userApproval2Note}</td>
                           <td>{item.userApproval1Name}</td>
@@ -285,7 +334,7 @@ const MemoReport = () => {
         )}
 
         {isSubmitted && !isLoading && filteredData.length === 0 && !searchError && (
-          <div className="card py-5 mt-5">
+          <div className="card py-5 mt-5 mx-3">
             <div className="ms-5 me-5">
               <p>Data not found.</p>
             </div>

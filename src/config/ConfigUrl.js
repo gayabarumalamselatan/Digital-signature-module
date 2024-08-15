@@ -13,3 +13,7 @@ export const AUTH_SERVICE_BASE = process.env.REACT_APP_API_AUTH_SERVICE_BASE;
     export const MEMO_SERVICE_GET_USER_LISTS =  `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/AllUserName`;
     export const MEMO_SERVICE_LOAD_PDF = `${MEMO_SERVICE_BASE}/internal-memo-service/doc/viewpdf`;
     export const MEMO_SERVICE_USERNAME_LISTS = `${AUTH_SERVICE_BASE}/auth-service/core-user/list`;
+    export const MEMO_SERVICE_SEARCH_NOMOR_SURAT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/get-nosurat`;
+    export const MEMO_SERVICE_SEARCH_TITLE_SURAT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/get-title`;
+    export const MEMO_SERVICE_REPORT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/statusMemoBy`;
+    

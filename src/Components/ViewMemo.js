@@ -7,7 +7,7 @@ import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { MEMO_SERVICE_DELETE, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
+import { MEMO_SERVICE_DELETE, MEMO_SERVICE_SEARCH_NOMOR_SURAT, MEMO_SERVICE_SEARCH_TITLE_SURAT, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
 import { text } from "@fortawesome/fontawesome-svg-core";
 
 
@@ -53,8 +53,11 @@ const ViewMemo = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${day}-${month}-${year}`;
+  };
 
 
   // Classic get method, show all data
@@ -70,27 +73,32 @@ const ViewMemo = () => {
   //Descending order (Id dari data terbaru)
   const fetchData = async () => {
     try {
+      let requestUrl;
       let urlParams;
-  
-          if (searchFilter !== "" && searchFilterValue !== "") {
-            urlParams = `size=${pageSize}&page=${currentPage}&${searchFilter}=${searchFilterValue}`;
-          } else {
-            urlParams = `size=${pageSize}&page=${currentPage}`;
-          }
 
-        const requestUrl = `${MEMO_SERVICE_VIEW_BASED_ON_USER}?userName=${userName}&${urlParams}`;
-        console.log("Request URL:", requestUrl);
+      if (searchFilter !== "" && searchFilterValue !== "") {
+        if (searchFilter === "nomor") {
+          urlParams =`noSurat=${searchFilterValue}`
+          requestUrl = `${MEMO_SERVICE_SEARCH_NOMOR_SURAT}?${urlParams}`;
+        } else if (searchFilter === "title") {
+          urlParams = `title=${searchFilterValue}`;
+          requestUrl = `${MEMO_SERVICE_SEARCH_TITLE_SURAT}?${urlParams}`;
+        }
+      } else {
+        requestUrl = `${MEMO_SERVICE_VIEW_BASED_ON_USER}?userName=${userName}`;
+      }
 
-        const response = await axios.get(requestUrl, { headers });
-        const sortedData = response.data.sort((a, b) => b.id - a.id);
-        setData(sortedData);
-        setTotalItem(response.data.totalItems);
+      console.log("Request URL:", requestUrl);
+
+      const response = await axios.get(requestUrl, { headers });
+      const sortedData = response.data.sort((a, b) => b.id - a.id);
+      setData(sortedData);
+      setTotalItem(response.data.totalItems);
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
   };
 
-  // Download done memo
   const downloadDoneMemo = async () => {
     Swal.fire({
       title: "Ups",
