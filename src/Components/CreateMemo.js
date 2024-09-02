@@ -150,16 +150,16 @@ function CreateMemo() {
     return Object.keys(newErrors).length === 0;
   }
 
-  // const formattedDateTime = (date) => {
-  //   const year = date.getFullYear();
-  //   const month = String(date.getMonth() + 1).padStart(2, '0');
-  //   const day = String(date.getDate()).padStart(2, '0');
-  //   const hour = String(date.getHours()).padStart(2, '0');
-  //   const minute = String(date.getMinutes()).padStart(2, '0');
-  //   const second = String(date.getSeconds()).padStart(2, '0');
-  //   const millisecond = String(date.getMilliseconds()).padStart(3, '0');
-  //   return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
-  // };
+  const formattedDateTime = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    const second = String(date.getSeconds()).padStart(2, '0');
+    const millisecond = String(date.getMilliseconds()).padStart(3, '0');
+    return `${year}-${month}-${day}T${hour}:${minute}:${second}.${millisecond}`;
+  };
 
   //Submit Function
   const handleSubmit = async (event) => {
@@ -171,13 +171,17 @@ function CreateMemo() {
       return;
     }
 
-    // const currentDate = new Date();
-    // const dueDate = new Date(formData.dueDate);
-    // dueDate.setHours(currentDate.getHours());
-    // dueDate.setMinutes(currentDate.getMinutes());
-    // dueDate.setSeconds(currentDate.getSeconds());
-    // dueDate.setMilliseconds(currentDate.getMilliseconds());
-    // const formattedDueDate = formattedDateTime(dueDate);
+    const currentDate = new Date();
+    const dueDate = new Date(formData.dueDate);
+    const createDate = new Date(formData.createDate);
+    const requestDate = new Date(formData.requestDate);
+    dueDate.setHours(currentDate.getHours());
+    dueDate.setMinutes(currentDate.getMinutes());
+    dueDate.setSeconds(currentDate.getSeconds());
+    dueDate.setMilliseconds(currentDate.getMilliseconds());
+    const formattedDueDate = formattedDateTime(dueDate);
+    const formattedCreateDate = formattedDateTime(createDate);
+    const formattedRequestDate = formattedDateTime(requestDate);
 
     //Swal popup
     const result = await MySwal.fire({
@@ -205,7 +209,9 @@ function CreateMemo() {
           if (formData[key]) formDataToSend.append(key, formData[key]);
         }
 
-        //formDataToSend.set('dueDate', formattedDueDate);
+        formDataToSend.set('dueDate', formattedDueDate);
+        formDataToSend.set('createDate', formattedCreateDate);
+        formDataToSend.set('requestDate', formattedRequestDate);
     
         const response = await axios.post(
           `${MEMO_SERVICE_CREATE}`, 

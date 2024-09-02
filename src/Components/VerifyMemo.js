@@ -27,7 +27,7 @@ const VerifyMemo = () => {
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item"><a href="/">Home</a></li>
-                <li className="breadcrumb-item active">Verify</li>
+                <li className="breadcrumb-item active">Verify Memo</li>
               </ol>
             </div>
           </div>    

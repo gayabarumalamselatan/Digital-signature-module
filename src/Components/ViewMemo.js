@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import ModalEdit from './Modal/ModalEdit'
 import { getToken, getUserName, getUserId } from "../config/Constant";
 import Swal from "sweetalert2";
@@ -301,6 +301,7 @@ const ViewMemo = () => {
 
   const allowedButtons = ['digital_signature_admin'];
 
+
   return (
     <>
       <section className="content-header">
@@ -464,22 +465,22 @@ const ViewMemo = () => {
                     ))}
                   </tbody>
                 </table>
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div>
-                    Showing {Math.min(startIndex, totalItem)} to {Math.min(endIndex, totalItem)} of {totalItem} entries
-                  </div>
-                  <Pagination>
-                    <Pagination.Prev
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 0}
-                    />
-                    {renderPaginationItems()}
-                    <Pagination.Next
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === pageCount - 1}
-                    />
-                  </Pagination>
+              </div>
+              <div className="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                  Showing {Math.min(startIndex, totalItem)} to {Math.min(endIndex, totalItem)} of {totalItem} entries
                 </div>
+                <Pagination>
+                  <Pagination.Prev
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 0}
+                  />
+                  {renderPaginationItems()}
+                  <Pagination.Next
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pageCount - 1}
+                  />
+                </Pagination>
               </div>
             </div>
           </div>

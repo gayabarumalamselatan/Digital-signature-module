@@ -7,6 +7,7 @@ import Signature from "./SignaturePad";
 import Swal from "sweetalert2";
 import { getToken, getUserId, getUserName, token } from "../../config/Constant";
 import { MEMO_SERVICE_CREATE, MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
+import { duration } from "moment";
 
 const userId = getUserId();
 // const userName = getUserName();
@@ -141,7 +142,10 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     const year = date.getFullYear();
     const month = ("0" + (date.getMonth() + 1)).slice(-2);
     const day = ("0" + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
+    const hours = ("0" + date.getHours()).slice(-2);
+    const minutes = ("0" + date.getMinutes()).slice(-2);
+    const seconds = ("0" + date.getSeconds()).slice(-2);
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   };
 
   const handleSubmit = async (e) => {
@@ -186,6 +190,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
             },
           });
 
+
           const token = getToken();
           const config = {
             headers: {
@@ -225,6 +230,24 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
           });
 
           data.set("userId", userId);
+
+          const dueDate = new Date(formData.dueDate);
+          const currentDate = new Date();
+          const gapDay = currentDate - dueDate;
+
+          let days = Math.floor(gapDay / (1000 * 3600 * 24));
+          let hours = Math.floor((gapDay % (1000 * 3600 * 24)) / (1000 * 3600));
+          let minutes = Math.floor((gapDay % (1000 * 3600)) / (1000 * 60));
+
+          let responseString = `waktu: ${days} hari, ${hours} jam, ${minutes} menit`;
+          
+          if(isApproval1){
+            data.set('durationApproval1', responseString);
+            data.set('userApproval1Date', formatDate(currentDate));
+          }else{
+            data.set('durationApproval2', responseString);
+            data.set('userApproval2Date', formatDate(currentDate));
+          }
 
           if (file) {
             data.append("file", file);
@@ -272,7 +295,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     <>
       <Modal show={show} onHide={handleClose} size="xl" scrollable={true}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit</Modal.Title>
+          <Modal.Title>Edit Memo</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form className="row g-3" onSubmit={handleSubmit}>
