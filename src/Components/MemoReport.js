@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "primereact/button";
 import React, { useEffect, useState } from "react";
 import { getToken } from "../config/Constant";
-import { MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_PAGINAT, MEMO_SERVICE_REPORT } from "../config/ConfigUrl";
+import { MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_PAGINAT, MEMO_SERVICE_REPORT, MEMO_SERVICE_REPORT_ALL } from "../config/ConfigUrl";
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { FaDownload, FaSyncAlt} from "react-icons/fa"
@@ -45,11 +45,31 @@ const MemoReport = () => {
     }
   };
 
+  const durationColor = (approvalDate, dueDate) => {
+    if (new Date(approvalDate) > new Date(dueDate)) {
+      return "#dc3545";
+    } else if (new Date(approvalDate) < new Date(dueDate)) {
+      return "#198754"; 
+    } else if (new Date(approvalDate) === new Date(dueDate)) {
+      return "#198754"; // 
+    } else {
+      return "";
+    }
+  };
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const token = getToken();
-      const response = await axios.get(`${MEMO_SERVICE_REPORT}?dueDate=${formatedDate(formData.dueDate)}&statusMemo=${formData.statusMemo}`, {
+      let url;
+
+      if(formData.statusMemo === 'ALL'){
+        url = `${MEMO_SERVICE_REPORT_ALL}?dueDate=${formatedDate(formData.dueDate)}`
+      }else{
+        url = `${MEMO_SERVICE_REPORT}?dueDate=${formatedDate(formData.dueDate)}&statusMemo=${formData.statusMemo}`
+      }
+
+      const response = await axios.get(url, {
         headers: {
           Authorization:` Bearer ${token}`,
         },
@@ -112,10 +132,11 @@ const MemoReport = () => {
     const second = String(date.getSeconds()).padStart(2, '0');
     const millisecond = String(date.getMilliseconds()).padStart(3, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hour}:${minute}:${second}.${millisecond}`;
+    return `${year}-${month}-${day}`;
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -150,6 +171,10 @@ const MemoReport = () => {
             "USER APPROVAL 2 NOTE",
             "USER APPROVAL 1 NAME",
             "USER APPROVAL 2 NAME",
+            "USER APPROVAL 1 DATE",
+            "USER APPROVAL 2 DATE",
+            "USER APPROVAL 1 DURATION",
+            "USER APPROVAL 2 DURATION",
         ],
         ...filteredData.map(row => [
             row.title,
@@ -165,6 +190,10 @@ const MemoReport = () => {
             row.userApproval2Note,
             row.userApproval1Name,
             row.userApproval2Name,
+            row.userApproval1Date,
+            row.userApproval2Date,
+            row.durationApproval1,
+            row.durationApproval2,
         ])
     ];
 
@@ -304,6 +333,10 @@ const MemoReport = () => {
                         <th scope="col">User Approval 2 Note</th>
                         <th scope="col">User Approval 1 Name</th>
                         <th scope="col">User Approval 2 Name</th>
+                        <th scope="col">User Approval 2 Date</th>
+                        <th scope="col">User Approval 2 Date</th>
+                        <th scope="col">User Approval 1 Duration</th>
+                        <th scope="col">User Approval 2 Duration</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -323,6 +356,18 @@ const MemoReport = () => {
                           <td>{item.userApproval2Note}</td>
                           <td>{item.userApproval1Name}</td>
                           <td>{item.userApproval2Name}</td>
+                          <td>{formatDate(item.userApproval1Date)}</td>
+                          <td>{formatDate(item.userApproval2Date)}</td>
+                          <td style={{ 
+                            color: durationColor(item.userApproval1Date, item.dueDate, item.durationApproval1) 
+                          }}>
+                            {item.durationApproval1?.includes("-") ? item.durationApproval1.split('-').join('') : item.durationApproval1 ?? ""}
+                          </td>
+                          <td style={{ 
+                            color: durationColor(item.userApproval2Date, item.dueDate, item.durationApproval2)
+                          }}>
+                            {item.durationApproval2?.includes("-") ? item.durationApproval2.split('-').join('') : item.durationApproval2 ?? ""}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

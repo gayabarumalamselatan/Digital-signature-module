@@ -7,7 +7,7 @@ import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { MEMO_SERVICE_DELETE, MEMO_SERVICE_SEARCH_NOMOR_SURAT, MEMO_SERVICE_SEARCH_TITLE_SURAT, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
+import { MEMO_SERVICE_DELETE, MEMO_SERVICE_DOWNLOAD_DONE, MEMO_SERVICE_SEARCH_NOMOR_SURAT, MEMO_SERVICE_SEARCH_TITLE_SURAT, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
 import { text } from "@fortawesome/fontawesome-svg-core";
 
 
@@ -52,6 +52,7 @@ const ViewMemo = () => {
   },[currentPage, pageSize]);
 
   const formatDate = (dateString) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -99,15 +100,18 @@ const ViewMemo = () => {
     }
   };
 
-  const downloadDoneMemo = async () => {
-    Swal.fire({
-      title: "Ups",
-      text:  "This service in unavailable",
-      icon: "warning",
-      confirmButtonText: "Back",
-    });
+  const downloadDoneMemo = async (nomor) => {
     try{
-      // const response = await axios.get(`/api/download`, {headers});
+      const response = await axios.get(`${MEMO_SERVICE_DOWNLOAD_DONE}?fileId=${nomor}`, {
+        headers, 
+        responseType: 'arraybuffer'
+      });
+      const blob = new Blob([response.data], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `memo-${nomor}.pdf`; // Assuming the file is a PDF
+      a.click();
     }catch(error){
       console.error('error', error);
     }
@@ -152,6 +156,18 @@ const ViewMemo = () => {
         return "#198754";
       default:
         return "";
+    }
+  };
+
+  const durationColor = (approvalDate, dueDate) => {
+    if (new Date(approvalDate) > new Date(dueDate)) {
+      return "#dc3545";
+    } else if (new Date(approvalDate) < new Date(dueDate)) {
+      return "#198754"; 
+    } else if (new Date(approvalDate) === new Date(dueDate)) {
+      return "#198754"; // 
+    } else {
+      return "";
     }
   };
 
@@ -410,6 +426,10 @@ const ViewMemo = () => {
                       <th scope="col">User Approval 2 Note</th>
                       <th scope="col">User Approval 1 Name</th>
                       <th scope="col">User Approval 2 Name</th>
+                      <th scope="col">User Approval 1 Date</th>
+                      <th scope="col">User Approval 2 Date</th>
+                      <th scope="col">User Approval 1 Duration</th>
+                      <th scope="col">User Approval 2 Duration</th>
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
@@ -426,12 +446,24 @@ const ViewMemo = () => {
                         <td>{item.tipeDokumen}</td>
                         <td>{formatDate(item.createDate)}</td>
                         <td>{formatDate(item.dueDate)}</td>
-                        <td style={{ color: getStatusMemoColor(item.statusMemo) }}>{item.statusMemo}</td>
+                        <td style={{color: getStatusMemoColor(item.statusMemo)}}>{item.statusMemo}</td>
                         <td>{item.userMaker}</td>
                         <td>{item.userApproval1Note}</td>
                         <td>{item.userApproval2Note}</td>
                         <td>{item.userApproval1Name}</td>
                         <td>{item.userApproval2Name}</td>
+                        <td>{formatDate(item.userApproval1Date)}</td>
+                        <td>{formatDate(item.userApproval2Date)}</td>
+                        <td style={{ 
+                          color: durationColor(item.userApproval1Date, item.dueDate, item.durationApproval1) 
+                        }}>
+                          {item.durationApproval1?.includes("-") ? item.durationApproval1.split('-').join('') : item.durationApproval1 ?? ""}
+                        </td>
+                        <td style={{ 
+                          color: durationColor(item.userApproval2Date, item.dueDate, item.durationApproval2)
+                        }}>
+                          {item.durationApproval2?.includes("-") ? item.durationApproval2.split('-').join('') : item.durationApproval2 ?? ""}
+                        </td>
                         <td>
                           <div>
                             <button className="btn btn-outline-primary mx-2" onClick={() => handleEditClick(item)}>
@@ -451,7 +483,7 @@ const ViewMemo = () => {
                             {item.statusMemo === 'DONE' ? 
                             (
                               <>
-                                <button className="btn btn-outline-success me-2" onClick={downloadDoneMemo} style={{backgroundColor: "#198754", borderColor: "#198754"}}>
+                                <button className="btn btn-outline-success me-2" onClick={() => downloadDoneMemo(item.nomor)} style={{backgroundColor: "#198754", borderColor: "#198754"}}>
                                   <FontAwesomeIcon icon={faDownload}/>
                                 </button> 
                               </>

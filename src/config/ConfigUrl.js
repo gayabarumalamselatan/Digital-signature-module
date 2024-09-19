@@ -16,4 +16,10 @@ export const AUTH_SERVICE_BASE = process.env.REACT_APP_API_AUTH_SERVICE_BASE;
     export const MEMO_SERVICE_SEARCH_NOMOR_SURAT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/get-nosurat`;
     export const MEMO_SERVICE_SEARCH_TITLE_SURAT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/get-title`;
     export const MEMO_SERVICE_REPORT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/statusMemoBy`;
+    export const MEMO_SERVICE_REPORT_ALL = `${MEMO_SERVICE_BASE}/internal-memo-service/form/list/statusMemoByAll`;
+    export const MEMO_SERVICE_FILE_LISTS = `${MEMO_SERVICE_BASE}/internal-memo-service/form/listFileData`;
+    export const MEMO_SERVICE_FILE_FILTER = `${MEMO_SERVICE_BASE}/internal-memo-service/form/listFiles`;
+    export const MEMO_SERVICE_FILE_NAME = `${MEMO_SERVICE_BASE}/internal-memo-service/form/listByFileName`;
+    export const MEMO_SERVICE_DOWNLOAD_DONE = `${MEMO_SERVICE_BASE}/internal-memo-service/form/download`;
+
     

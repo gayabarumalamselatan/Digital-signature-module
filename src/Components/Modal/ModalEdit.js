@@ -7,7 +7,7 @@ import Signature from "./SignaturePad";
 import Swal from "sweetalert2";
 import { getToken, getUserId, getUserName, token } from "../../config/Constant";
 import { MEMO_SERVICE_CREATE, MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
-import { duration } from "moment";
+
 
 const userId = getUserId();
 // const userName = getUserName();
@@ -129,14 +129,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     }
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => {
-      return { ...prevData, [name]: value };
-    });
-  };
-
-  const formatDate = (dateString) => {
+    const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -147,6 +140,27 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     const seconds = ("0" + date.getSeconds()).slice(-2);
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   };
+
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    if (name === 'requestDate' || name === 'createDate' || name === 'dueDate') {
+      setFormData((prevData) => {
+        return { ...prevData, [name]: formatDate(value) };
+      });
+    } else {
+      setFormData((prevData) => {
+        return { ...prevData, [name]: value };
+      });
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -368,7 +382,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 className="form-control"
                 id="RequestDate"
                 name="requestDate"
-                value={formData.requestDate}
+                value={formatDateForDisplay(formData.requestDate)}
                 onChange={handleChange}
                 disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
@@ -398,7 +412,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 className="form-control"
                 id="CreateDate"
                 name="createDate"
-                value={formData.createDate}
+                value={formatDateForDisplay(formData.createDate)}
                 onChange={handleChange}
                 disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
@@ -413,7 +427,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 className="form-control"
                 id="DueDate"
                 name="dueDate"
-                value={formData.dueDate}
+                value={formatDateForDisplay(formData.dueDate)}
                 onChange={handleChange}
                 disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
@@ -479,7 +493,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 <option value="REJECTED">REJECTED</option>
                 <option value="REWORK">REWORK</option>
                 <option value="APPROVE_BY_APPROVAL1">APPROVE_BY_APPROVAL1</option>
-                <option value="APPROVE_BY_APPROVAL2">APPROVE_BY_APPROVAL2</option>
+                <option value="DONE">APPROVE_BY_APPROVAL2</option>
               </select>
             </div>
 
@@ -567,7 +581,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
               </div>
             </div>
 
-            {formData.statusMemo === 'APPROVE_BY_APPROVAL1' || formData.statusMemo === 'APPROVE_BY_APPROVAL2' ? (
+            {formData.statusMemo === 'APPROVE_BY_APPROVAL1' || formData.statusMemo === 'DONE' ? (
               <>
                 <div className="col-md-6 ">
                   <div className="ms-4 mt-4">

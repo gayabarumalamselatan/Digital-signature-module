@@ -209,9 +209,10 @@ function CreateMemo() {
           if (formData[key]) formDataToSend.append(key, formData[key]);
         }
 
-        formDataToSend.set('dueDate', formattedDueDate);
+        // formDataToSend.set('dueDate', formattedDueDate);
         formDataToSend.set('createDate', formattedCreateDate);
         formDataToSend.set('requestDate', formattedRequestDate);
+
     
         const response = await axios.post(
           `${MEMO_SERVICE_CREATE}`, 
