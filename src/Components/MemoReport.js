@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "primereact/button";
 import React, { useEffect, useState } from "react";
 import { getToken } from "../config/Constant";
-import { MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_PAGINAT, MEMO_SERVICE_REPORT, MEMO_SERVICE_REPORT_ALL } from "../config/ConfigUrl";
+import { MEMO_SERVICE_VIEW, MEMO_SERVICE_REPORT, MEMO_SERVICE_REPORT_ALL } from "../config/ConfigUrl";
 import * as XLSX from 'xlsx';
 import Swal from "sweetalert2";
 import { FaDownload, FaSyncAlt} from "react-icons/fa"

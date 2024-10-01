@@ -5,9 +5,9 @@ import React from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DropFileInput from "./drop-file-input/DropFileInput";
-import { getToken, getUserId, getUserName } from "../config/Constant";
-import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_USERNAME_LISTS } from "../config/ConfigUrl";
-import { Button } from "react-bootstrap";
+import { getToken, getUserId, getUserName, reject } from "../config/Constant";
+import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_FILE_UPLOAD, MEMO_SERVICE_USERNAME_LISTS } from "../config/ConfigUrl";
+import { message } from "antd";
 
 const MySwal = withReactContent(Swal);
 const token = getToken();
@@ -34,6 +34,7 @@ function CreateMemo() {
     userId: gettingUserId,
   });
   const [options, setOptions] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [newOptions, setNewOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -41,6 +42,8 @@ function CreateMemo() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [gettingUserName, setGettingUserName] = useState(getUserName());
+  const [progress, setProgress] = useState(0);
+  const [uploadedFileObjects, setUploadedFileObjects] = useState([]);
 
   const handleFileChange = (files) => {
     setSelectedFiles(files);
@@ -116,6 +119,17 @@ function CreateMemo() {
 
   }, [formData.requestDate]);
 
+  // Auto Generate
+  useEffect(() => {
+    axios.get('http://10.8.135.84:18080/internal-memo-service/form/nextSequnce', { headers })
+    .then(response => {
+      setFormData((prevData) => ({
+        ...prevData,
+        nomor: response.data,
+      }))
+    })
+  },[]);
+
   const validateForm = () => {
     const requiredFields = [
       "title", "tipeDokumen", "nomor", "requestor", "requestDate", "requestTitle", 
@@ -161,15 +175,77 @@ function CreateMemo() {
     return `${year}-${month}-${day}T${hour}:${minute}:${second}.${millisecond}`;
   };
 
+
+  const handleUpload = () => {
+    
+    if(!validateField()){
+      MySwal.fire("Error! ", "Please fill all required fields above.", "error");
+      return;
+    }
+
+    if (fileList.length === 0) {
+      setFileError(true);
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      message.error("Token not available. Unable to upload.");
+      return;
+    }
+    
+    
+
+    const formDatafile = new FormData();
+    
+    formDatafile.append("fileId", formData.nomor);
+    fileList.forEach((file) => {
+      formDatafile.append("file", file);
+    });
+
+
+    setUploading(true);
+    setFileError(false); // Reset error state
+
+    axios
+      .post(MEMO_SERVICE_FILE_UPLOAD, formDatafile, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setProgress(percentCompleted);
+        },
+      })
+      .then((response) => {
+        console.log("Upload response:", response.data);
+        message.success("File uploaded successfully.");
+        setFileList([]); // Clear file list after successful upload
+        // setUploadedFiles([...uploadedFiles, fileList[0].name]);
+        // setUploadedFileObjects([...uploadedFileObjects, fileList[0]]);
+      })
+      .catch((error) => {
+        console.error("Upload failed:", error);
+        message.error("File upload failed.");
+      })
+      .finally(() => {
+        setUploading(false);
+        setProgress(0);
+      });
+    
+  };
+
+
   //Submit Function
   const handleSubmit = async (event) => {
     event.preventDefault();
     
     //Memanggil Function require field
-    if (!validateForm()) {
-      MySwal.fire("Error!", "Please fill in all required fields.", "error");
-      return;
-    }
+    // if (!validateForm()) {
+    //   MySwal.fire("Error!", "Please fill in all required fields.", "error");
+    //   return;
+    // }
 
     const currentDate = new Date();
     const dueDate = new Date(formData.dueDate);
@@ -212,6 +288,7 @@ function CreateMemo() {
         // formDataToSend.set('dueDate', formattedDueDate);
         formDataToSend.set('createDate', formattedCreateDate);
         formDataToSend.set('requestDate', formattedRequestDate);
+        
 
     
         const response = await axios.post(
@@ -224,6 +301,16 @@ function CreateMemo() {
             },
           }
         );
+
+        
+         try {
+          await handleUpload();
+         }catch (error) {
+          MySwal.fire("Error!", error, "error");
+          return;
+        }
+        
+        
         
         MySwal.fire("Submitted!", "Your form has been submitted.", "success").then(() => {
           handleCancel(event);
@@ -235,6 +322,8 @@ function CreateMemo() {
       }
     }
   };
+
+  
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -332,7 +421,7 @@ function CreateMemo() {
               
               {renderInputField("Title", "title", "text", true)}
               {renderSelectField("Tipe Dokumen", "tipeDokumen", ["BAST", "Klaim Kesehatan", "PR PO", "Lain-lain"])}
-              {renderInputField("Nomor", "nomor")}
+              {renderInputField("Nomor", "nomor", "text", true)}
               {renderSelectField("Requestor", "requestor", options )}
               {renderInputField("Request Date", "requestDate", "date")}
               {renderInputField("Request Title", "requestTitle")}
@@ -341,8 +430,8 @@ function CreateMemo() {
               {renderInputField("Due Date", "dueDate", "date")}
               {/* {renderSelectField("Status Memo", "statusMemo", ["ON_PROGRESS", "PENDING", "REJECTED", "REWORK", "APPROVE_BY_APPROVAL1", "APPROVE_BY_APPROVAL2"])} */}
               {renderSelectField("User Maker", "userMaker", options)}
-              {renderTextAreaField("User Approval 1 Note", "userApproval1Note", true)}
-              {renderTextAreaField("User Approval 2 Note", "userApproval2Note", true)}
+              {/* {renderTextAreaField("User Approval 1 Note", "userApproval1Note", true)}
+              {renderTextAreaField("User Approval 2 Note", "userApproval2Note", true)} */}
               {renderSelectField("User Approval 1 Name", "userApproval1Name", options,  )}
               {renderSelectField("User Approval 2 Name", "userApproval2Name", options,  )}
 
@@ -358,6 +447,8 @@ function CreateMemo() {
                     validateField={validateField}
                     fileList={fileList}
                     setFileList={setFileList}
+                    handleUpload={handleUpload}
+                    
                   />
                   {errors.file && <small className="text-danger">{errors.file}</small>}
                 </div>

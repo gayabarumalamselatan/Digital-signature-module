@@ -1,21 +1,67 @@
 import React, {useState} from 'react'
 import Swal from 'sweetalert2';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { getToken } from '../../config/Constant';
+import axios from 'axios';
+import { MEMO_SERVICE_VERIFY_DOCUMENT } from '../../config/ConfigUrl';
 
 
 const ModalVerify = ({showVerify, handleCloseVerify, selectedFileId, selectedFileName}) => {
-    
-  // const requiredForm = () => { 
-  //   const requiredField = [
-  //     'nomorSurat', 'fileSurat'
-  //   ];
+  const [file, setFile] = useState(null);  
 
-  //   const newErrors = {};
+  const token = getToken();
 
-  //   requiredField.forEach(field => {
-  //     if (!formData[field]) newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required!`;
-  //   });
-  // };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!file) {
+      Swal.fire("Error!", "Please select a file to verify.", "error");
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('file', file);
+    formDataToSend.append('fileId', selectedFileId);
+    formDataToSend.append('fileName', selectedFileName);
+
+    try {
+      Swal.fire({
+        title: "Loading...",
+        text: "Please wait while we process your request.",
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const response = await axios.post(
+        `${MEMO_SERVICE_VERIFY_DOCUMENT}`,
+        formDataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        if(response.data === 'signature verifies: true') {
+          Swal.fire("Success!", "This file is autentic from DS.", "success");
+        }else if(response.data === 'signature verifies: false') {
+          Swal.fire("Error!", "This file is not autentic from DS.", "error");
+        }
+      } else {
+        Swal.fire("Error!", "Failed to send file for verification", "error");
+      }
+    } catch (error) {
+      Swal.fire("Error!", "There was an error submitting the form.", "error");
+    }
+  };
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
 
   
   
@@ -50,7 +96,8 @@ const ModalVerify = ({showVerify, handleCloseVerify, selectedFileId, selectedFil
             <Form.Group>
               <Form.Label>File Target:</Form.Label>
               <Form.Control
-              type='file'
+                type='file'
+                onChange={handleFileChange}
               />
             </Form.Group>
 
@@ -60,7 +107,7 @@ const ModalVerify = ({showVerify, handleCloseVerify, selectedFileId, selectedFil
           <Button variant="secondary" onClick={handleCloseVerify}>
             Cancel
           </Button>
-          <Button variant="primary">
+          <Button variant="primary" onClick={handleSubmit}>
             Verify
           </Button>
         </Modal.Footer>

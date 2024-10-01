@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import { Pagination } from "react-bootstrap";
 import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faEdit, faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { MEMO_SERVICE_DELETE, MEMO_SERVICE_DOWNLOAD_DONE, MEMO_SERVICE_SEARCH_NOMOR_SURAT, MEMO_SERVICE_SEARCH_TITLE_SURAT, MEMO_SERVICE_VIEW, MEMO_SERVICE_VIEW_BASED_ON_USER, MEMO_SERVICE_VIEW_PAGINATE } from "../config/ConfigUrl";
 import { text } from "@fortawesome/fontawesome-svg-core";
 
@@ -466,9 +466,7 @@ const ViewMemo = () => {
                         </td>
                         <td>
                           <div>
-                            <button className="btn btn-outline-primary mx-2" onClick={() => handleEditClick(item)}>
-                              <FontAwesomeIcon icon={faEdit}/>
-                            </button>
+                            
                             {allowedButtons.includes(userName)? 
                               (
                                 <>
@@ -480,16 +478,23 @@ const ViewMemo = () => {
                                 <></>
                               )
                             }
-                            {item.statusMemo === 'DONE' ? 
-                            (
+                            {item.statusMemo === 'DONE' ? (
                               <>
-                                <button className="btn btn-outline-success me-2" onClick={() => downloadDoneMemo(item.nomor)} style={{backgroundColor: "#198754", borderColor: "#198754"}}>
+                                <button className="btn btn-outline-success mx-2" onClick={() => downloadDoneMemo(item.nomor)} style={{backgroundColor: "#198754", borderColor: "#198754"}}>
                                   <FontAwesomeIcon icon={faDownload}/>
                                 </button> 
                               </>
                             ):(
-                              <></>
-                            )
+                              item.statusMemo === 'REJECTED' ? (
+                                <button className="btn btn-outline-primary mx-2" onClick={() => handleEditClick(item)}>
+                                  <FontAwesomeIcon icon={faEye}/>
+                                </button>
+                              ):(
+                                <button className="btn btn-outline-primary mx-2" onClick={() => handleEditClick(item)}>
+                                  <FontAwesomeIcon icon={faEdit}/>
+                                </button>
+                                )
+                              )
                             }
                           </div>
                         </td>

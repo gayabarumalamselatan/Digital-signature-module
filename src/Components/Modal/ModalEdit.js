@@ -6,7 +6,11 @@ import PdfViewer from "../PdfViewer/PdfViewer";
 import Signature from "./SignaturePad";
 import Swal from "sweetalert2";
 import { getToken, getUserId, getUserName, token } from "../../config/Constant";
-import { MEMO_SERVICE_CREATE, MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
+import { MEMO_SERVICE_FILE_UPLOAD, MEMO_SERVICE_FORM_LIST, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_UPDATE } from "../../config/ConfigUrl";
+import DropFileInput from "../drop-file-input/DropFileInput";
+import withReactContent from "sweetalert2-react-content";
+import { message } from "antd";
+
 
 
 const userId = getUserId();
@@ -44,6 +48,15 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
   const headers = { Authorization: `Bearer ${token}`};
   const [userName, setUserName] = useState(getUserName());
   const [signature, setSignature] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [fileError, setFileError] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [fileList, setFileList] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const MySwal = withReactContent(Swal);
 
   const getSignature = (base64Signature) => {
     setSignature(base64Signature);
@@ -102,6 +115,20 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     fetchUserNames();
   }, [memo, userName]);
 
+
+
+  useEffect(() => {
+    if (formData.userApproval1Name === userName && isApproval1) {
+      setFormData((prevData) => {
+        return { ...prevData, statusMemo: "APPROVE_BY_APPROVAL1" };
+      });
+    } else if (formData.userApproval2Name === userName && isApproval2) {
+      setFormData((prevData) => {
+        return { ...prevData, statusMemo: "APPROVE_BY_APPROVAL2" };
+      });
+    }
+  }, [formData.userApproval1Name, formData.userApproval2Name, isApproval1, isApproval2, userName]);
+
    const fetchUserNames = async () => {
       try {
         const response = await axios.get(`${MEMO_SERVICE_GET_USER_LISTS}`, {headers});
@@ -147,23 +174,110 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
     return date.toISOString().split("T")[0];
   };
 
+  const validateField = () => {
+    const requiredFields = [
+
+    ];
+    const newErrors = {};
+    
+    requiredFields.forEach(field => {
+      if (!formData[field]) newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required!`;
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (name === 'requestDate' || name === 'createDate' || name === 'dueDate') {
+    if (name === "requestDate" || name === "createDate" || name === "dueDate") {
       setFormData((prevData) => {
         return { ...prevData, [name]: formatDate(value) };
+      });
+    } else if (name === "userApproval1Name" && value === userName && isApproval1) {
+      setFormData((prevData) => {
+        return { ...prevData, [name]: value, statusMemo: "APPROVE_BY_APPROVAL1" };
+      });
+    } else if (name === "userApproval2Name" && value === userName && isApproval2) {
+      setFormData((prevData) => {
+        return { ...prevData, [name]: value, statusMemo: "APPROVE_BY_APPROVAL2" };
       });
     } else {
       setFormData((prevData) => {
         return { ...prevData, [name]: value };
       });
+    }
+  };
+
+  // File Input
+  const handleFileChange = (files) => {
+    setSelectedFiles(files);
+  };
+
+  const handleUpload = () => {
+    
+    if(!validateField()){
+      MySwal.fire("Error! ", "Please fill all required fields above.", "error");
+      return;
     }
+
+    if (fileList.length === 0) {
+      setFileError(true);
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      message.error("Token not available. Unable to upload.");
+      return;
+    }
+    
+    
+
+    const formDatafile = new FormData();
+    
+    formDatafile.append("fileId", formData.nomor);
+    fileList.forEach((file) => {
+      formDatafile.append("file", file);
+    });
+
+
+    setUploading(true);
+    setFileError(false); // Reset error state
+
+    axios
+      .post(MEMO_SERVICE_FILE_UPLOAD, formDatafile, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setProgress(percentCompleted);
+        },
+      })
+      .then((response) => {
+        console.log("Upload response:", response.data);
+        message.success("File uploaded successfully.");
+        setFileList([]); // Clear file list after successful upload
+        // setUploadedFiles([...uploadedFiles, fileList[0].name]);
+        // setUploadedFileObjects([...uploadedFileObjects, fileList[0]]);
+      })
+      .catch((error) => {
+        console.error("Upload failed:", error);
+        message.error("File upload failed.");
+      })
+      .finally(() => {
+        setUploading(false);
+        setProgress(0);
+      });
+    
   };
 
 
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
 
     if (showSignature && !document.getElementById("digisignKey")?.value) {
       Swal.fire({
@@ -213,8 +327,17 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
             },
           };
 
+          
+
           let updatedFormData = {...formData};
           const base64Value = `data:image/png;base64,${signature}`;
+
+          if (isMaker && formData.statusMemo === 'REWORK') {
+            updatedFormData = {
+              ...updatedFormData,
+              statusMemo: "ON_PROGRESS",
+            };
+          }
 
           if (formData.statusMemo !== "REJECTED" || formData.statusMemo !== "REWORK" || formData.statusMemo !== 'PENDING') {
             updatedFormData = {
@@ -267,7 +390,19 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
             data.append("file", file);
           }
 
+          
+
           const response = await axios.put(`${MEMO_SERVICE_UPDATE}`, data, config);
+
+          if(isMaker && formData.statusMemo === 'REWORK'){
+            try{
+              await handleUpload();
+            }catch(error){
+              MySwal.fire("Error!", error, "error");
+              return;
+            }
+          }
+          
 
           Swal.fire({
             title: "Saved!",
@@ -339,7 +474,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                // disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && isMaker) || !isMaker && !isAdmin}
               />
             </div>
 
@@ -354,7 +490,8 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="nomor"
                 value={formData.nomor}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                // disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly
               />
             </div>
 
@@ -369,7 +506,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestor"
                 value={formData.requestor}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -384,7 +521,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestDate"
                 value={formatDateForDisplay(formData.requestDate)}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -399,7 +536,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestTitle"
                 value={formData.requestTitle}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -414,7 +551,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="createDate"
                 value={formatDateForDisplay(formData.createDate)}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -429,7 +566,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="dueDate"
                 value={formatDateForDisplay(formData.dueDate)}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -443,7 +580,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="userApproval1Name"
                 value={formData.userApproval1Name}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               >
                 <option value="">Select an option</option>
                 {userNames.map((user, index) => (
@@ -464,7 +601,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="userApproval2Name"
                 value={formData.userApproval2Name}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                disabled={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               >
                 <option value="">Select an option</option>
                 {userNames.map((user, index) => (
@@ -485,7 +622,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="statusMemo"
                 value={formData.statusMemo}
                 onChange={handleChange}
-                disabled = {(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isAdmin &&!isApproval1 && !isApproval2}
+                disabled = {(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isAdmin && !isApproval1 && !isApproval2}
               >
                 <option value="">Select an option</option>
                 <option value="ON_PROGRESS">ON_PROGRESS</option>
@@ -493,7 +630,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 <option value="REJECTED">REJECTED</option>
                 <option value="REWORK">REWORK</option>
                 <option value="APPROVE_BY_APPROVAL1">APPROVE_BY_APPROVAL1</option>
-                <option value="DONE">APPROVE_BY_APPROVAL2</option>
+                <option value="APPROVE_BY_APPROVAL2">APPROVE_BY_APPROVAL2</option>
               </select>
             </div>
 
@@ -507,7 +644,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="requestDetail"
                 value={formData.requestDetail}
                 onChange={handleChange}
-                disabled={(formData.statusMemo === 'DONE' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
+                readOnly={(formData.statusMemo === 'REJECTED' && userName === 'digital_signature_maker') || !isMaker && !isAdmin}
               />
             </div>
 
@@ -521,7 +658,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="userApproval1Note"
                 value={formData.userApproval1Note}
                 onChange={handleChange}
-                disabled={!isAdmin && !isApproval1}
+                readOnly={!isAdmin && !isApproval1}
               />
             </div>
 
@@ -535,7 +672,7 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
                 name="userApproval2Note"
                 value={formData.userApproval2Note}
                 onChange={handleChange}
-                disabled={!isAdmin && !isApproval2}
+                readOnly={!isAdmin && !isApproval2}
               />
             </div>
 
@@ -581,7 +718,26 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
               </div>
             </div>
 
-            {formData.statusMemo === 'APPROVE_BY_APPROVAL1' || formData.statusMemo === 'DONE' ? (
+            
+            {isMaker && formData.statusMemo === "REWORK" ? 
+              <div className="col-md-6">
+                <DropFileInput
+                  onFileChange={handleFileChange}
+                  setFileError={setFileError}
+                  uploadedFiles={uploadedFiles}
+                  setUploadedFiles={setUploadedFiles}
+                  fileError={fileError}
+                  resetUploadedFiles={handleSubmit}
+                  fileList={fileList}
+                  setFileList={setFileList}
+                />
+              </div> 
+              :
+              <></>
+            }
+
+
+            {formData.statusMemo === 'APPROVE_BY_APPROVAL1' || formData.statusMemo === 'APPROVE_BY_APPROVAL2' ? (
               <>
                 <div className="col-md-6 ">
                   <div className="ms-4 mt-4">
@@ -636,9 +792,13 @@ function ModalEdit({ show, handleClose, memo, fetchData,  }) {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
+          {formData.statusMemo === 'REJECTED' ?
+            <></>
+          :
           <Button variant="primary" onClick={handleSubmit}>
             Save Changes
           </Button>
+          }
         </Modal.Footer>
       </Modal>
 

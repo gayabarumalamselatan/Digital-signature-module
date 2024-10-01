@@ -10,7 +10,17 @@ import Swal from "sweetalert2";
 const { Dragger } = Upload;
 const MySwal = withReactContent(Swal);
 
-const DropFileInput = ({fileList, setFileList, validateField, uploadedFiles, setUploadedFiles, fileError, setFileError, resetUploadFiles}) => {
+const DropFileInput = ({
+    fileList, 
+    setFileList, 
+    validateField,
+    uploadedFiles, 
+    setUploadedFiles, 
+    fileError, 
+    setFileError, 
+    resetUploadFiles, 
+    handleUpload
+  }) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadedFileObjects, setUploadedFileObjects] = useState([]);
@@ -22,58 +32,6 @@ const DropFileInput = ({fileList, setFileList, validateField, uploadedFiles, set
     }
   },[resetUploadFiles]);
 
-  const handleUpload = () => {
-    if(!validateField()){
-      MySwal.fire("Error! ", "Please fill all required fields above.", "error");
-      return;
-    }
-
-    if (fileList.length === 0) {
-      setFileError(true);
-      return;
-    }
-
-    const token = getToken();
-    if (!token) {
-      message.error("Token not available. Unable to upload.");
-      return;
-    }
-
-    const formData = new FormData();
-    fileList.forEach((file) => {
-      formData.append("file", file);
-    });
-
-    setUploading(true);
-    setFileError(false); // Reset error state
-
-    axios
-      .post(MEMO_SERVICE_FILE_UPLOAD, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setProgress(percentCompleted);
-        },
-      })
-      .then((response) => {
-        console.log("Upload response:", response.data);
-        message.success("File uploaded successfully.");
-        setFileList([]); // Clear file list after successful upload
-        setUploadedFiles([...uploadedFiles, fileList[0].name]);
-        setUploadedFileObjects([...uploadedFileObjects, fileList[0]]);
-      })
-      .catch((error) => {
-        console.error("Upload failed:", error);
-        message.error("File upload failed.");
-      })
-      .finally(() => {
-        setUploading(false);
-        setProgress(0);
-      });
-  };
 
   const handleRemove = (file) => {
     const newFileList = fileList.filter((f) => f.uid !== file.uid);
@@ -150,14 +108,14 @@ const DropFileInput = ({fileList, setFileList, validateField, uploadedFiles, set
         </Dragger>
       </div>
       {fileError && <Alert message="Warning" description="Upload a document first before submitting." type="warning" showIcon style={{ marginTop: 20 }} />}
-      <Button 
+      {/* <Button 
         type="primary" 
         onClick={handleUpload} 
         disabled={uploading || fileList.length === 0} 
         loading={uploading} 
         style={{ marginTop: 30 }}>
         {uploading ? "Uploading" : "Upload"}
-      </Button>
+      </Button> */}
       {/* {uploadedFiles.length > 0 && (
         <div className="justify-content-start text-start" style={{ marginTop: 20 }}>
           <h4>Uploaded Files:</h4>
