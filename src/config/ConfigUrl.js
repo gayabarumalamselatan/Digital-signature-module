@@ -22,6 +22,7 @@ export const AUTH_SERVICE_BASE = process.env.REACT_APP_API_AUTH_SERVICE_BASE;
     export const MEMO_SERVICE_FILE_NAME = `${MEMO_SERVICE_BASE}/internal-memo-service/form/listByFileName`;
     export const MEMO_SERVICE_DOWNLOAD_DONE = `${MEMO_SERVICE_BASE}/internal-memo-service/form/download`;
     export const MEMO_SERVICE_VERIFY_DOCUMENT = `${MEMO_SERVICE_BASE}/internal-memo-service/form/VerifyDS`;
+    export const MEMO_SERVICE_GENERATE_NOMOR = `${MEMO_SERVICE_BASE}/internal-memo-service/form/nextSequence`;
 
 
     

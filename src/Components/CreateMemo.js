@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import DropFileInput from "./drop-file-input/DropFileInput";
 import { getToken, getUserId, getUserName, reject } from "../config/Constant";
-import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_FILE_UPLOAD, MEMO_SERVICE_USERNAME_LISTS } from "../config/ConfigUrl";
+import { MEMO_SERVICE_CREATE, MEMO_SERVICE_GET_USER_LISTS, MEMO_SERVICE_FILE_UPLOAD, MEMO_SERVICE_USERNAME_LISTS, MEMO_SERVICE_GENERATE_NOMOR } from "../config/ConfigUrl";
 import { message } from "antd";
 
 const MySwal = withReactContent(Swal);
@@ -120,15 +120,15 @@ function CreateMemo() {
   }, [formData.requestDate]);
 
   // Auto Generate
-  useEffect(() => {
-    axios.get('http://10.8.135.84:18080/internal-memo-service/form/nextSequnce', { headers })
-    .then(response => {
-      setFormData((prevData) => ({
-        ...prevData,
-        nomor: response.data,
-      }))
-    })
-  },[]);
+  // useEffect(() => {
+  //   axios.get(`${MEMO_SERVICE_GENERATE_NOMOR}`, { headers })
+  //   .then(response => {
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       nomor: response.data,
+  //     }))
+  //   })
+  // },[]);
 
   const validateForm = () => {
     const requiredFields = [
